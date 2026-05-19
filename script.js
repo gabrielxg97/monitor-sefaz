@@ -19,7 +19,13 @@ const menus = {
     sections: [
       { label:'Operação', items: [
         { icon:'💻', name:'Caixa (PDV)', desc:'Frente de caixa', page:'vendas-caixa' },
+<<<<<<< HEAD
         { icon:'🌐', name:'Delivery', desc:'Ecommerce e Manual', page:'vendas-delivery' }
+=======
+        { type:'divider', name: 'DELIVERY' },
+        { icon:'🌐', name:'Pedidos Ecommerce', desc:'Cardápio/Ifood', page:'vendas-delivery-ecommerce', indent: true },
+        { icon:'📝', name:'Pedidos Delivery', desc:'Lançamento Manual', page:'vendas-delivery-manual', indent: true }
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
       ]},
       { label:'Configurações', items: [
         { icon:'📱', name:'Cardápio Digital', desc:'Menu Online', page:'vendas-cardapio-digital' },
@@ -285,8 +291,11 @@ function navigateTo(pageKey) {
     if(typeof renderCardapioConfig === 'function') renderCardapioConfig();
   } else if (pageKey === 'vendas-caixa') {
     if(typeof openCaixa === 'function') openCaixa();
+<<<<<<< HEAD
   } else if (pageKey === 'vendas-delivery') {
     if(typeof openDeliveryPage === 'function') openDeliveryPage();
+=======
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
   }
 
   // Apenas atualiza a classe active sem reconstruir o DOM (evita a "piscada")
@@ -1368,8 +1377,13 @@ function saveProduct() {
     categoria: document.getElementById('f-categoria').value || 'Sem Categoria',
     subcategoria: document.getElementById('f-subcategoria') ? document.getElementById('f-subcategoria').value : '',
     tipo: document.getElementById('f-tipo') ? document.getElementById('f-tipo').value : '',
+<<<<<<< HEAD
     venda: parseFloat(document.getElementById('f-venda').value.replace(',', '.')) || 0,
     custo: parseFloat(document.getElementById('f-custo').value.replace(',', '.')) || 0,
+=======
+    venda: parseFloat(document.getElementById('f-venda').value) || 0,
+    custo: parseFloat(document.getElementById('f-custo').value) || 0,
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     estoque: estqVal ? parseInt(estqVal) : '-',
     ativo: document.getElementById('f-ativo').checked,
     delivery: document.getElementById('f-delivery') ? document.getElementById('f-delivery').checked : true,
@@ -1448,15 +1462,24 @@ function calcMarkup() {
   const markupStr = document.getElementById('f-markup').value;
   
   if(custoStr && markupStr) {
+<<<<<<< HEAD
     const custo = parseFloat(custoStr.replace(',', '.'));
     const markup = parseFloat(markupStr);
     if(!isNaN(custo) && !isNaN(markup)) {
       const venda = custo * (1 + (markup / 100));
       document.getElementById('f-venda').value = venda.toFixed(2).replace('.', ',');
+=======
+    const custo = parseFloat(custoStr);
+    const markup = parseFloat(markupStr);
+    if(!isNaN(custo) && !isNaN(markup)) {
+      const venda = custo * (1 + (markup / 100));
+      document.getElementById('f-venda').value = venda.toFixed(2);
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     }
   }
 }
 
+<<<<<<< HEAD
 function formatarValorMonetario(el) {
   // Se é o primeiro dígito sendo digitado em um campo com valor inicial "0,00" ou similar
   if(el.dataset.inicial === 'true' && el.value.match(/^0,0+$/)) {
@@ -1481,6 +1504,8 @@ function formatarValorMonetario(el) {
   }
 }
 
+=======
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
 function updateToggleStyle(el, trackId) {
   // handled by pure css .tog input:checked + .tog-track
 }
@@ -1594,6 +1619,7 @@ function renderConfigMesas() {
 
 function openCaixa() {
   const overlay = document.getElementById('caixa-overlay');
+<<<<<<< HEAD
   const acoesBtnDiv = document.getElementById('btn-acoes-caixa');
   const label = document.getElementById('caixa-status-label');
   
@@ -1608,6 +1634,17 @@ function openCaixa() {
   } else {
     overlay.style.display = 'none';
     acoesBtnDiv.style.display = 'flex';
+=======
+  const fecharBtn = document.getElementById('btn-fechar-caixa');
+  const label = document.getElementById('caixa-status-label');
+  
+  if(caixaStatus === 'fechado') {
+    overlay.style.display = 'flex';
+    fecharBtn.style.display = 'none';
+    label.textContent = 'Status: Fechado';
+  } else {
+    overlay.style.display = 'none';
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     const openedAt = localStorage.getItem('caixaAbertoEm');
     let timeStr = '';
     if(openedAt) {
@@ -1625,7 +1662,11 @@ function openCaixa() {
 }
 
 function abrirCaixa() {
+<<<<<<< HEAD
   const val = parseFloat(document.getElementById('f-fundo-troco').value.replace(',', '.')) || 0;
+=======
+  const val = parseFloat(document.getElementById('f-fundo-troco').value) || 0;
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
   caixaSaldoInicial = val;
   caixaStatus = 'aberto';
   localStorage.setItem('caixaStatus', 'aberto');
@@ -1648,7 +1689,11 @@ function fecharCaixa() {
   container.innerHTML = mockPagamentos.filter(p => p.ativo).map(p => `
     <div style="display:flex;justify-content:space-between;margin-bottom:12px;align-items:center">
       <div style="font-size:14px;font-weight:600">${p.nome}</div>
+<<<<<<< HEAD
       <input type="text" step="0.01" class="form-input" style="width:120px;text-align:right" placeholder="0,00" id="fechar-val-${p.id}" data-inicial="true" oninput="formatarValorMonetario(this)" />
+=======
+      <input type="number" step="0.01" class="form-input" style="width:120px;text-align:right" placeholder="0.00" id="fechar-val-${p.id}" />
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     </div>
   `).join('');
   
@@ -1727,6 +1772,7 @@ function confirmarFechamentoCaixa() {
   openCaixa();
 }
 
+<<<<<<< HEAD
 function toggleMenuAcoesCaixa() {
   const menu = document.getElementById('menu-acoes-caixa');
   if(menu) {
@@ -1830,6 +1876,8 @@ function confirmarSuprimento() {
   cancelarSuprimento();
 }
 
+=======
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
 function switchCaixaTab(tabId, el) {
   if (tabId === 'balcao') {
     // Restaurar a aba visual anterior para não ficar com "Balcão" acesa antes de confirmar
@@ -2253,6 +2301,7 @@ function dropKanban(ev) {
   }
 }
 
+<<<<<<< HEAD
 // --- DELIVERY UNIFIED TAB SWITCH ---
 function switchDeliveryTab(tabId, el) {
   // Remove active de todas as abas
@@ -2274,6 +2323,8 @@ function switchDeliveryTab(tabId, el) {
   }
 }
 
+=======
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
 // --- MANUAL DELIVERY KANBAN LOGIC ---
 function renderManualDelivery() {
   const statuses = ['preparo', 'pronto', 'finalizado'];
@@ -2371,7 +2422,11 @@ function iniciarPedidoManual() {
   }
   const tel = document.getElementById('f-manual-telefone').value.trim();
   const end = document.getElementById('f-manual-endereco').value.trim();
+<<<<<<< HEAD
   const taxa = parseFloat(document.getElementById('f-manual-taxa').value.replace(',', '.')) || 0;
+=======
+  const taxa = parseFloat(document.getElementById('f-manual-taxa').value) || 0;
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
   
   window.pdvActiveDeliveryManualContext = {
     nome,
@@ -3130,8 +3185,12 @@ function finalizarVendaDireta() {
     if (titleEl) titleEl.textContent = 'Nova Venda Direta';
     
     showToast('Pedido manual criado com sucesso!', 'success');
+<<<<<<< HEAD
     window.pdvDeliveryDefaultTab = 'manual';
     navigateTo('vendas-delivery');
+=======
+    navigateTo('vendas-delivery-manual');
+>>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     return;
   }
 
