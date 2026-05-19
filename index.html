@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodFlow — Sistema de Gestão</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo" style="width:calc(100% - 24px);height:44px;border-radius:10px;font-size:11px;font-weight:800;letter-spacing:0px;line-height:1.1;text-align:center;flex-direction:row;display:flex;align-items:center;justify-content:center;gap:6px;margin:0 12px 36px 12px">
+    <span style="font-size:16px;letter-spacing:-0.5px">Gram</span>
+    <span style="font-size:13px;letter-spacing:1px;opacity:0.75">VIP</span>
+  </div>
+  <div class="nav-items" id="navItems">
+    <div class="nav-item" data-menu="dashboard">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Início</span>
+    </div>
+    <div class="nav-item" data-menu="produtos">
+      <span class="nav-icon">🍽️</span>
+      <span class="nav-label">Produtos</span>
+      <span class="nav-arrow">▼</span>
+    </div>
+    <div class="nav-item" data-menu="vendas">
+      <span class="nav-icon">🛍️</span>
+      <span class="nav-label">Vendas</span>
+      <span class="nav-arrow">▼</span>
+    </div>
+    <div class="nav-item" data-menu="pedidos">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">Pedidos</span>
+      <span class="nav-arrow">▼</span>
+    </div>
+    <div class="nav-item" data-menu="cozinha">
+      <span class="nav-icon">👨🍳</span>
+      <span class="nav-label">Cozinha</span>
+    </div>
+    <div class="nav-item" data-menu="mesas">
+      <span class="nav-icon">🪑</span>
+      <span class="nav-label">Mesas</span>
+    </div>
+    <div class="nav-item" data-menu="estoque">
+      <span class="nav-icon">📦</span>
+      <span class="nav-label">Estoque</span>
+    </div>
+    <div class="nav-item" data-menu="financeiro">
+      <span class="nav-icon">💰</span>
+      <span class="nav-label">Finanças</span>
+    </div>
+    <div class="nav-item" data-menu="relatorios">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Relatórios</span>
+    </div>
+  </div>
+
+  <div class="nav-bottom">
+    <div class="avatar" style="align-self:center">JP</div>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<main class="content" id="content">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+
+    <!-- HEADER + FILTRO -->
+    <div class="page-header" style="align-items:flex-start;flex-wrap:wrap;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--accent);margin-bottom:6px" id="greeting-label"></div>
+        <div class="page-title" id="greeting-name"></div>
+        <div class="page-sub" id="greeting-date"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px;padding:8px 14px">
+          <span style="font-size:13px;color:var(--text-dim)">De</span>
+          <input type="date" id="filterFrom" value="2026-05-14" style="background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;cursor:pointer" />
+          <input type="time" id="filterFromTime" value="00:00" style="background:transparent;border:none;color:var(--text-dim);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;cursor:pointer" />
+        </div>
+        <div style="color:var(--text-dim);font-size:13px">→</div>
+        <div style="display:flex;align-items:center;gap:6px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px;padding:8px 14px">
+          <span style="font-size:13px;color:var(--text-dim)">Até</span>
+          <input type="date" id="filterTo" value="2026-05-14" style="background:transparent;border:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;cursor:pointer" />
+          <input type="time" id="filterToTime" value="23:59" style="background:transparent;border:none;color:var(--text-dim);font-family:'DM Sans',sans-serif;font-size:12px;outline:none;cursor:pointer" />
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost" style="font-size:12px;padding:8px 12px" onclick="setPreset('hoje')">Hoje</button>
+          <button class="btn btn-ghost" style="font-size:12px;padding:8px 12px" onclick="setPreset('semana')">7 dias</button>
+          <button class="btn btn-ghost" style="font-size:12px;padding:8px 12px" onclick="setPreset('mes')">30 dias</button>
+        </div>
+        <button class="btn btn-primary" style="font-size:13px" onclick="applyFilter()">Aplicar</button>
+      </div>
+    </div>
+
+    <!-- PERÍODO ATIVO -->
+    <div id="filterLabel" style="font-size:12px;color:var(--accent);margin-bottom:20px;margin-top:-8px">
+      📅 Exibindo: Hoje (14/05/2026 00:00 → 23:59)
+    </div>
+
+    <!-- KPIs PRINCIPAIS -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px">
+      <div class="stat-card" style="border-color:rgba(232,160,32,0.25)">
+        <div class="stat-label">Faturamento Total</div>
+        <div class="stat-value" id="kpi-fat">R$4.820</div>
+        <div class="stat-change up">▲ 8% vs período ant.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total de Pedidos</div>
+        <div class="stat-value" id="kpi-ped">148</div>
+        <div class="stat-change up">▲ 12% vs período ant.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Ticket Médio Geral</div>
+        <div class="stat-value" id="kpi-ticket">R$32,57</div>
+        <div class="stat-change down">▼ 2% vs período ant.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Faturamento Delivery</div>
+        <div class="stat-value" id="kpi-del">R$2.140</div>
+        <div class="stat-change up">▲ 15% vs período ant.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Faturamento Casa</div>
+        <div class="stat-value" id="kpi-casa">R$2.680</div>
+        <div class="stat-change up">▲ 4% vs período ant.</div>
+      </div>
+    </div>
+
+    <!-- PRODUTOS + GARÇONS -->
+    <div class="two-col" style="margin-bottom:20px">
+
+      <!-- TOP PRODUTOS DELIVERY -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🛵 Top Produtos — Delivery</span>
+          <span class="badge blue">Top 5</span>
+        </div>
+        <table>
+          <thead><tr><th>#</th><th>Produto</th><th>Qtd</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">1</td><td>🍕 Pizza Calabresa</td><td>42</td><td style="color:var(--success)">R$1.677,80</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">2</td><td>🍗 Frango Grelhado</td><td>31</td><td style="color:var(--success)">R$926,90</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">3</td><td>🍺 Chopp 500ml</td><td>28</td><td style="color:var(--success)">R$417,20</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">4</td><td>🥩 Filé Mignon</td><td>12</td><td style="color:var(--success)">R$718,80</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">5</td><td>🥗 Salada Caesar</td><td>9</td><td style="color:var(--success)">R$224,10</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:12px 24px;border-top:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--text-dim)">122 itens vendidos</span>
+          <span style="font-size:13px;font-weight:600;color:var(--accent)">Total: R$3.964,80</span>
+        </div>
+      </div>
+
+      <!-- TOP PRODUTOS CASA -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🪑 Top Produtos — Casa</span>
+          <span class="badge" style="background:rgba(92,184,92,0.2);color:var(--success)">Top 5</span>
+        </div>
+        <table>
+          <thead><tr><th>#</th><th>Produto</th><th>Qtd</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">1</td><td>🥩 Filé Mignon</td><td>38</td><td style="color:var(--success)">R$2.276,20</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">2</td><td>🍗 Frango Grelhado</td><td>29</td><td style="color:var(--success)">R$867,10</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">3</td><td>🍺 Chopp 500ml</td><td>61</td><td style="color:var(--success)">R$909,90</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">4</td><td>🍰 Tiramisù</td><td>22</td><td style="color:var(--success)">R$415,80</td>
+            </tr>
+            <tr>
+              <td style="color:var(--accent);font-weight:700">5</td><td>🥗 Salada Caesar</td><td>17</td><td style="color:var(--success)">R$423,30</td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:12px 24px;border-top:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:var(--text-dim)">167 itens vendidos</span>
+          <span style="font-size:13px;font-weight:600;color:var(--accent)">Total: R$4.892,30</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GARÇONS + TICKET MÉDIO -->
+    <div class="two-col">
+
+      <!-- RANKING GARÇONS -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🏆 Ranking de Garçons</span>
+          <span class="badge" style="background:rgba(232,160,32,0.15);color:var(--accent)">Por faturamento</span>
+        </div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+
+          <div style="display:flex;align-items:center;gap:14px;padding:12px;background:rgba(232,160,32,0.06);border:1px solid rgba(232,160,32,0.2);border-radius:10px">
+            <div style="font-size:22px">🥇</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#e8a020,#c07010);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0f0e0c;flex-shrink:0">RM</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;color:var(--text)">Ricardo Mendes</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:2px">38 pedidos • ticket médio R$48,20</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:15px;font-weight:700;color:var(--accent)">R$1.831,60</div>
+              <div style="font-size:10px;color:var(--text-dim)">faturamento</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;padding:12px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px">
+            <div style="font-size:22px">🥈</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#9ba0aa,#6b7280);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0">AC</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;color:var(--text)">Ana Costa</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:2px">34 pedidos • ticket médio R$44,70</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:15px;font-weight:700;color:var(--text-mid)">R$1.519,80</div>
+              <div style="font-size:10px;color:var(--text-dim)">faturamento</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;padding:12px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px">
+            <div style="font-size:22px">🥉</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c97a40,#8b5e3c);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0">LS</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;color:var(--text)">Lucas Silva</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:2px">29 pedidos • ticket médio R$38,90</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:15px;font-weight:700;color:var(--text-mid)">R$1.128,10</div>
+              <div style="font-size:10px;color:var(--text-dim)">faturamento</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;padding:12px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px">
+            <div style="font-size:22px;color:var(--text-dim)">4º</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--text-mid);flex-shrink:0">MO</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;color:var(--text-mid)">Mariana Oliveira</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:2px">22 pedidos • ticket médio R$35,10</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:15px;font-weight:700;color:var(--text-dim)">R$772,20</div>
+              <div style="font-size:10px;color:var(--text-dim)">faturamento</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:14px;padding:12px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px">
+            <div style="font-size:22px;color:var(--text-dim)">5º</div>
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--text-mid);flex-shrink:0">PF</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:600;color:var(--text-mid)">Paulo Ferreira</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:2px">18 pedidos • ticket médio R(31,60</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:15px;font-weight:700;color:var(--text-dim)">R$568,80</div>
+              <div style="font-size:10px;color:var(--text-dim)">faturamento</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TICKET MÉDIO POR GARÇOM -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🎯 Ticket Médio por Garçom</span>
+        </div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px">
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">Referência geral: <strong style="color:var(--accent)">R$32,57</strong></div>
+
+          <div id="ticket-bars"></div>
+
+          <div style="margin-top:8px;padding-top:14px;border-top:1px solid var(--border-soft)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.2);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Maior ticket</div>
+                <div style="font-size:16px;font-weight:700;color:var(--success)">R$48,20</div>
+                <div style="font-size:11px;color:var(--text-dim)">Ricardo Mendes</div>
+              </div>
+              <div style="background:rgba(224,92,74,0.08);border:1px solid rgba(224,92,74,0.2);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px">Menor ticket</div>
+                <div style="font-size:16px;font-weight:700;color:var(--danger)">R$31,60</div>
+                <div style="font-size:11px;color:var(--text-dim)">Paulo Ferreira</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEATMAP -->
+    <div class="card" style="margin-top:20px">
+      <div class="card-header" style="justify-content:space-between">
+        <span class="card-title">🔥 Mapa de Calor — Vendas por Dia e Horário</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;color:var(--text-dim)">Menos</span>
+          <div style="display:flex;gap:3px;align-items:center">
+            <div style="width:14px;height:14px;border-radius:3px;background:rgba(232,160,32,0.06)"></div>
+            <div style="width:14px;height:14px;border-radius:3px;background:rgba(232,160,32,0.2)"></div>
+            <div style="width:14px;height:14px;border-radius:3px;background:rgba(232,160,32,0.42)"></div>
+            <div style="width:14px;height:14px;border-radius:3px;background:rgba(232,160,32,0.65)"></div>
+            <div style="width:14px;height:14px;border-radius:3px;background:rgba(232,160,32,0.88)"></div>
+            <div style="width:14px;height:14px;border-radius:3px;background:#e8a020"></div>
+          </div>
+          <span style="font-size:11px;color:var(--text-dim)">Mais</span>
+        </div>
+      </div>
+      <div style="padding:20px 24px 24px;overflow-x:auto">
+        <div id="heatmap-container"></div>
+      </div>
+      <!-- Tooltip -->
+      <div id="hm-tooltip" style="position:fixed;background:#1e1c18;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text);pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:9999;white-space:nowrap"></div>
+    </div>
+
+  </div>
+
+  <!-- CARDÁPIO → PRODUTOS -->
+  <div class="page" id="page-produtos-lista">
+
+    <div class="page-header">
+      <div>
+        <div class="page-title" id="page-produtos-title">Produtos</div>
+        <div class="page-sub" id="prod-count-label">Carregando...</div>
+      </div>
+      <button class="btn btn-primary" onclick="openProductDrawer(null)">＋ Novo Produto</button>
+    </div>
+
+    <!-- BARRA DE BUSCA + FILTROS -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+      <input id="prod-search" class="search-input" style="max-width:320px" placeholder="🔍  Buscar por nome ou código..." oninput="renderProducts()" />
+      
+      <select id="prod-filter-cat" class="form-input" style="width:180px;cursor:pointer" onchange="renderProducts()">
+        <option value="">Todas as Categorias</option>
+      </select>
+
+      <div style="display:flex;gap:6px;margin-left:auto;align-items:center">
+        <span style="font-size:12px;color:var(--text-dim)">Exibir:</span>
+        <button id="filter-ativos"   class="btn btn-primary"  style="font-size:12px;padding:7px 14px" onclick="setProdFilter('ativos')">Ativos</button>
+        <button id="filter-inativos" class="btn btn-ghost"    style="font-size:12px;padding:7px 14px" onclick="setProdFilter('inativos')">Inativos</button>
+        <button id="filter-todos"    class="btn btn-ghost"    style="font-size:12px;padding:7px 14px" onclick="setProdFilter('todos')">Todos</button>
+      </div>
+    </div>
+
+    <!-- CABEÇALHO DA LISTA GERADO DINAMICAMENTE -->
+
+    <!-- LISTA DE PRODUTOS -->
+    <div id="prod-list" style="border:1px solid var(--border-soft);border-radius:0 0 10px 10px;overflow:hidden"></div>
+
+    <div id="prod-empty" style="display:none;text-align:center;padding:48px 20px;color:var(--text-dim)">
+      <div style="font-size:36px;margin-bottom:12px">📭</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text-mid);margin-bottom:6px">Nenhum produto encontrado</div>
+      <div style="font-size:13px">Tente ajustar os filtros ou cadastre um novo produto.</div>
+    </div>
+  </div>
+
+  <!-- DELIVERY ECOMMERCE -->
+  <!-- DELIVERY UNIFICADO -->
+  <div class="page" id="page-vendas-delivery">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Delivery</div>
+        <div class="page-sub">Gestão de pedidos Ecommerce e Manual</div>
+      </div>
+      <button class="btn btn-primary" onclick="abrirModalNovoDeliveryManual()">＋ Novo Pedido</button>
+    </div>
+
+    <!-- ABAS -->
+    <div style="padding:16px 24px;border-bottom:1px solid var(--border-soft);background:var(--card-bg);display:flex;gap:12px">
+      <button class="futuristic-tab active" data-delivery-tab="ecommerce" onclick="switchDeliveryTab('ecommerce', this)" style="padding:10px 20px">🌐 Ecommerce</button>
+      <button class="futuristic-tab" data-delivery-tab="manual" onclick="switchDeliveryTab('manual', this)" style="padding:10px 20px">📝 Manual</button>
+    </div>
+
+    <!-- KANBAN ECOMMERCE -->
+    <div id="delivery-ecommerce-pane" style="padding:24px;height:calc(100vh - 190px);overflow-x:auto;background:var(--bg);display:flex">
+      <div style="display:flex;gap:16px;height:100%;min-width:900px">
+        
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+            NOVO <span id="badge-kanban-novo" style="background:var(--accent);color:#000;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+          </div>
+          <div id="col-kanban-novo" data-status="novo" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+            EM PREPARO <span id="badge-kanban-preparo" style="background:var(--accent);color:#000;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+          </div>
+          <div id="col-kanban-preparo" data-status="preparo" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+            SAIU PARA ENTREGA <span id="badge-kanban-saiu_entrega" style="background:var(--accent);color:#000;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+          </div>
+          <div id="col-kanban-saiu_entrega" data-status="saiu_entrega" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+            PEDIDO PRONTO <span id="badge-kanban-pronto" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+          </div>
+          <div id="col-kanban-pronto" data-status="pronto" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+            FINALIZADO <span id="badge-kanban-finalizado" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+          </div>
+          <div id="col-kanban-finalizado" data-status="finalizado" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KANBAN MANUAL -->
+    <div id="delivery-manual-pane" style="padding:24px;height:calc(100vh - 190px);overflow-x:auto;background:var(--bg);display:none;flex">
+      <div style="display:flex;gap:16px;height:100%;min-width:600px">
+        
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+            EM PREPARO <span id="badge-kanban-manual-preparo" style="background:var(--accent);color:#000;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+          </div>
+          <div id="col-kanban-manual-preparo" data-status="preparo" ondragover="allowDropManual(event)" ondrop="dropKanbanManual(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+            PEDIDO PRONTO <span id="badge-kanban-manual-pronto" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+          </div>
+          <div id="col-kanban-manual-pronto" data-status="pronto" ondragover="allowDropManual(event)" ondrop="dropKanbanManual(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          </div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+            FINALIZADO <span id="badge-kanban-manual-finalizado" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+          </div>
+          <div id="col-kanban-manual-finalizado" data-status="finalizado" ondragover="allowDropManual(event)" ondrop="dropKanbanManual(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-novo-delivery-manual-overlay"></div>
+  <div class="modal" id="modal-novo-delivery-manual" style="width:500px">
+    <div class="modal-header">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin:0">Novo Pedido Delivery</h3>
+      <button class="btn btn-ghost" onclick="fecharModalNovoDeliveryManual()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:16px">
+      <div class="form-group">
+        <label class="form-label">Nome do Cliente</label>
+        <input type="text" id="f-manual-nome" class="form-input" placeholder="Ex: João Silva">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefone / WhatsApp</label>
+        <input type="text" id="f-manual-telefone" class="form-input" placeholder="(00) 00000-0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Endereço de Entrega</label>
+        <input type="text" id="f-manual-endereco" class="form-input" placeholder="Rua, Número, Complemento">
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label">Taxa de Entrega (R$)</label>
+        <input type="text" id="f-manual-taxa" class="form-input" placeholder="0,00" oninput="formatarValorMonetario(this)">
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="iniciarPedidoManual()">Iniciar Pedido</button>
+    </div>
+  </div>
+
+  <!-- DELIVERY ECOMMERCE (ANTIGO - MANTER COMPATIBILIDADE) -->
+  <div class="page" id="page-vendas-delivery-ecommerce" style="display:none">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Pedidos Ecommerce</div>
+        <div class="page-sub">Gestão de pedidos via Cardápio Digital e Integrações</div>
+      </div>
+    </div>
+    <div style="padding:24px;height:calc(100vh - 120px);overflow-x:auto;background:var(--bg)">
+        <div style="display:flex;gap:16px;height:100%;min-width:900px">
+          
+          <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+            <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+              NOVO <span id="badge-kanban-novo" style="background:var(--accent);color:#000;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+            </div>
+            <div id="col-kanban-novo" data-status="novo" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+            </div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+            <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+              EM PREPARO <span id="badge-kanban-preparo" style="background:var(--accent);color:#000;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+            </div>
+            <div id="col-kanban-preparo" data-status="preparo" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+            </div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+            <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+              SAIU PARA ENTREGA <span id="badge-kanban-saiu_entrega" style="background:var(--accent);color:#000;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+            </div>
+            <div id="col-kanban-saiu_entrega" data-status="saiu_entrega" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+            </div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+            <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+              PEDIDO PRONTO <span id="badge-kanban-pronto" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+            </div>
+            <div id="col-kanban-pronto" data-status="pronto" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+            </div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+            <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+              FINALIZADO <span id="badge-kanban-finalizado" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+            </div>
+            <div id="col-kanban-finalizado" data-status="finalizado" ondragover="allowDrop(event)" ondrop="dropKanban(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+            </div>
+          </div>
+
+        </div>
+    </div>
+  </div>
+
+  <!-- DELIVERY MANUAL (ANTIGO - MANTER COMPATIBILIDADE) -->
+  <div class="page" id="page-vendas-delivery-manual" style="display:none">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Pedidos Delivery (Manual)</div>
+        <div class="page-sub">Lançamento e gestão de pedidos por telefone/WhatsApp</div>
+      </div>
+      <button class="btn btn-primary" onclick="abrirModalNovoDeliveryManual()">＋ Novo Pedido</button>
+    </div>
+    <div style="padding:24px;height:calc(100vh - 120px);overflow-x:auto;background:var(--bg)">
+        <div style="display:flex;gap:16px;height:100%;min-width:600px">
+          
+          <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+            <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+              EM PREPARO <span id="badge-kanban-manual-preparo" style="background:var(--accent);color:#000;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+            </div>
+            <div id="col-kanban-manual-preparo" data-status="preparo" ondragover="allowDropManual(event)" ondrop="dropKanbanManual(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+            </div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+            <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+              PEDIDO PRONTO <span id="badge-kanban-manual-pronto" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+            </div>
+            <div id="col-kanban-manual-pronto" data-status="pronto" ondragover="allowDropManual(event)" ondrop="dropKanbanManual(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+            </div>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
+            <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
+              FINALIZADO <span id="badge-kanban-manual-finalizado" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
+            </div>
+            <div id="col-kanban-manual-finalizado" data-status="finalizado" ondragover="allowDropManual(event)" ondrop="dropKanbanManual(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+            </div>
+          </div>
+
+        </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modal-novo-delivery-manual-overlay"></div>
+  <div class="modal" id="modal-novo-delivery-manual" style="width:500px">
+    <div class="modal-header">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin:0">Novo Pedido Delivery</h3>
+      <button class="btn btn-ghost" onclick="fecharModalNovoDeliveryManual()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:16px">
+      <div class="form-group">
+        <label class="form-label">Nome do Cliente</label>
+        <input type="text" id="f-manual-nome" class="form-input" placeholder="Ex: João Silva">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Telefone / WhatsApp</label>
+        <input type="text" id="f-manual-telefone" class="form-input" placeholder="(00) 00000-0000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Endereço de Entrega</label>
+        <input type="text" id="f-manual-endereco" class="form-input" placeholder="Rua, Número, Complemento">
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label">Taxa de Entrega (R$)</label>
+        <input type="text" id="f-manual-taxa" class="form-input" placeholder="0,00" oninput="formatarValorMonetario(this)">
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="iniciarPedidoManual()">Iniciar Pedido</button>
+    </div>
+  </div>
+
+  <!-- CATEGORIAS -->
+  <div class="page" id="page-produtos-categorias">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Categorias e Subcategorias</div>
+        <div class="page-sub">Organize seus produtos por seções</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <input type="text" id="nova-cat-input" class="form-input" placeholder="Nome da Categoria" />
+        <button class="btn btn-primary" onclick="addCategoria()">＋ Categoria</button>
+      </div>
+    </div>
+    
+    <div id="categorias-container" style="margin-top:20px;display:flex;flex-direction:column;gap:12px">
+      <!-- JS -->
+    </div>
+  </div>
+
+  <!-- PROMOÇÕES -->
+  <div class="page" id="page-produtos-promocoes">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Promoções & Happy Hour</div>
+        <div class="page-sub">Regras de preço por horário ou quantidade</div>
+      </div>
+      <button class="btn btn-primary">＋ Nova Promoção</button>
+    </div>
+    <div class="empty-state" style="margin-top:40px">
+      <div class="empty-icon">🎁</div>
+      <h3>Nenhuma promoção ativa</h3>
+      <p>Configure descontos para dias específicos ou preços de atacado.</p>
+    </div>
+  </div>
+
+  <!-- CONTAGEM DE ESTOQUE -->
+  <div class="page" id="page-produtos-contagem">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Contagem de Estoque</div>
+        <div class="page-sub">Inventário físico e ajuste massivo</div>
+      </div>
+      <div style="display:flex;gap:10px;position:relative">
+        <input type="text" id="contagem-search" class="form-input" placeholder="Buscar por nome ou código..." autocomplete="off" onkeyup="searchContagem(this.value)" style="width:250px" />
+        <div id="contagem-autocomplete" style="display:none;position:absolute;top:44px;left:0;width:350px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:8px;box-shadow:0 8px 16px rgba(0,0,0,0.3);z-index:100;max-height:240px;overflow-y:auto"></div>
+      </div>
+    </div>
+    
+    <div style="background:var(--card-bg);border:1px solid var(--border-soft);border-radius:12px;overflow:hidden;margin-top:20px">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:rgba(0,0,0,0.15)">
+            <th style="padding:14px;text-align:left;font-size:11px;color:var(--text-dim);text-transform:uppercase;width:80px">Cód</th>
+            <th style="padding:14px;text-align:left;font-size:11px;color:var(--text-dim);text-transform:uppercase">Produto / Insumo</th>
+            <th style="padding:14px;text-align:center;font-size:11px;color:var(--text-dim);text-transform:uppercase;width:120px">Estoque Atual</th>
+            <th style="padding:14px;text-align:right;font-size:11px;color:var(--text-dim);text-transform:uppercase;width:140px">Nova Contagem</th>
+          </tr>
+        </thead>
+        <tbody id="contagem-tbody">
+          <!-- JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;display:flex;justify-content:flex-end">
+      <button class="btn btn-primary" onclick="salvarContagem()">Salvar Contagem</button>
+    </div>
+  </div>
+
+  <!-- GRUPOS DE COMPOSIÇÃO -->
+  <div class="page" id="page-produtos-composicao">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Grupos de Composição</div>
+        <div class="page-sub">Crie opções como "Ponto da Carne", "Adicionais" e atrele aos produtos.</div>
+      </div>
+      <button class="btn btn-primary" onclick="addGrupo()">＋ Novo Grupo</button>
+    </div>
+    <div id="grupos-container" style="margin-top:20px;display:flex;flex-direction:column;gap:12px">
+      <!-- JS -->
+    </div>
+  </div>
+
+  <!-- UNIDADES DE MEDIDA -->
+  <div class="page" id="page-produtos-unidades">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Unidades de Medida</div>
+        <div class="page-sub">Gestão de conversores e unidades</div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <input type="text" id="nova-unidade-input" class="form-input" placeholder="Ex: CX24" style="width:120px" onkeypress="if(event.key==='Enter') addUnidade()" />
+        <button class="btn btn-primary" onclick="addUnidade()">＋ Adicionar</button>
+      </div>
+    </div>
+    
+    <div style="background:var(--card-bg);border:1px solid var(--border-soft);border-radius:12px;overflow:hidden;margin-top:20px">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:rgba(0,0,0,0.15)">
+            <th style="padding:14px;text-align:left;font-size:11px;color:var(--text-dim);text-transform:uppercase">Sigla da Unidade</th>
+            <th style="padding:14px;text-align:right;font-size:11px;color:var(--text-dim);text-transform:uppercase">Ação</th>
+          </tr>
+        </thead>
+        <tbody id="unidades-tbody">
+          <!-- JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL CADASTRO/EDIÇÃO DE PRODUTO -->
+  <div id="prod-overlay" class="modal-overlay" onclick="closeProductDrawer()" style="z-index:9999"></div>
+  <div id="prod-drawer" class="modal" style="z-index:10000;width:640px;max-width:95vw">
+    
+    <div class="modal-header">
+      <div>
+        <div id="drawer-title" style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--text)">Novo Produto</div>
+        <div id="drawer-sub" style="font-size:12px;color:var(--text-dim);margin-top:3px">Preencha os dados do produto</div>
+      </div>
+      
+      <div style="display:flex;align-items:center;gap:12px">
+        <div id="wrapper-servico" style="display:flex;align-items:center;gap:8px;background:var(--card-bg);padding:6px 12px;border-radius:8px;border:1px solid var(--border-soft)">
+          <div style="font-size:11px;font-weight:600;color:var(--text)">Taxa Serv.</div>
+          <label class="tog" style="transform:scale(0.7);transform-origin:right">
+            <input type="checkbox" id="f-servico" checked>
+            <span class="tog-track" style="margin:0"></span>
+          </label>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;background:var(--card-bg);padding:6px 12px;border-radius:8px;border:1px solid var(--border-soft)">
+          <div style="font-size:11px;font-weight:600;color:var(--text)">Ativo</div>
+          <label class="tog" style="transform:scale(0.7);transform-origin:right">
+            <input type="checkbox" id="f-ativo" checked>
+            <span class="tog-track" style="margin:0"></span>
+          </label>
+        </div>
+
+        <button onclick="closeProductDrawer()" style="background:rgba(255,255,255,0.06);border:1px solid var(--border-soft);border-radius:8px;width:34px;height:34px;color:var(--text-dim);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;margin-left:8px" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">✕</button>
+      </div>
+    </div>
+
+    <div class="modal-tabs">
+      <div class="modal-tab active" id="tab-nav-geral" onclick="switchProdTab('geral', this)">Geral</div>
+      <div class="modal-tab" id="tab-nav-fotos" onclick="switchProdTab('fotos', this)">Fotos</div>
+      <div class="modal-tab" id="tab-nav-delivery" onclick="switchProdTab('delivery', this)">Delivery</div>
+      <div class="modal-tab" id="tab-nav-composicao" onclick="switchProdTab('composicao', this)">Composição</div>
+      <div class="modal-tab" id="tab-nav-ficha" onclick="switchProdTab('ficha', this)">Ficha Técnica</div>
+      <div class="modal-tab" id="tab-nav-fornecedores" onclick="switchProdTab('fornecedores', this)">Fornecedores</div>
+      <div class="modal-tab" id="tab-nav-analise-materia" onclick="switchProdTab('analise-materia', this)">Análise de Custo</div>
+      <div class="modal-tab" id="tab-nav-analise" onclick="switchProdTab('analise', this)" style="color:var(--accent)">📊 Análise</div>
+    </div>
+
+    <div class="modal-body">
+      <!-- TAB GERAL -->
+      <div id="tab-geral" class="tab-pane active">
+        <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:14px">
+          <div class="form-group">
+            <label class="form-label">Código Interno</label>
+            <div style="position:relative">
+              <input id="f-codigo" class="form-input" placeholder="Ex: 001" style="padding-right:36px" />
+              <button style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px" title="Buscar próximo código livre">🔍</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Código EAN</label>
+            <input id="f-ean" class="form-input" placeholder="Ex: 789123456" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nome do Produto</label>
+            <input id="f-nome" class="form-input" placeholder="Ex: Frango Grelhado" />
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:14px;margin-bottom:14px">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Tipo de Produto</label>
+            <select id="f-tipo" class="form-input" style="cursor:pointer">
+              <option value="">Selecione o tipo</option>
+              <option>Mercadoria para Revenda</option>
+              <option>Matéria Prima</option>
+              <option>Produto Acabado</option>
+              <option>Embalagem</option>
+            </select>
+          </div>
+          <div class="form-group" id="wrapper-categoria" style="margin:0">
+            <label class="form-label">Categoria</label>
+            <select id="f-categoria" class="form-input" style="cursor:pointer">
+              <option value="">Selecione</option>
+              <option>Pratos Principais</option>
+              <option>Entradas</option>
+              <option>Pizzas</option>
+              <option>Sobremesas</option>
+              <option>Bebidas</option>
+            </select>
+          </div>
+          <div class="form-group" id="wrapper-subcategoria" style="margin:0">
+            <label class="form-label">Subcategoria</label>
+            <select id="f-subcategoria" class="form-input" style="cursor:pointer">
+              <option value="">Selecione</option>
+              <option>Bovino</option>
+              <option>Frango</option>
+              <option>Massas</option>
+              <option>Sobremesas Frias</option>
+              <option>Refrigerantes</option>
+              <option>Sucos Naturais</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 2fr;gap:14px;margin-bottom:14px">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Unidade</label>
+            <select id="f-unidade" class="form-input" style="cursor:pointer">
+              <option value="UN">UN</option>
+              <option value="KG">KG</option>
+              <option value="L">L</option>
+              <option value="CX">CX</option>
+              <option value="PT">PT</option>
+            </select>
+          </div>
+          <div class="form-group" id="wrapper-balanca" style="margin:0">
+            <label class="form-label">Balança?</label>
+            <div style="display:flex;align-items:center;height:38px">
+              <label class="tog">
+                <input type="checkbox" id="f-balanca">
+                <span class="tog-track"></span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Estoque Atual</label>
+            <input id="f-estoque" class="form-input" type="number" placeholder="Ex: 50" />
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:14px;margin-bottom:14px">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Custo (R$)</label>
+            <input id="f-custo" class="form-input" type="text" placeholder="0,00" oninput="formatarValorMonetario(this); calcMarkup()" />
+            <div style="font-size:10px;color:var(--text-dim);margin-top:4px" id="lbl-gera-ficha">Gera via Ficha Técnica</div>
+          </div>
+          <div class="form-group" id="wrapper-markup" style="margin:0">
+            <label class="form-label">Markup (%)</label>
+            <input id="f-markup" class="form-input" type="number" step="0.1" placeholder="Ex: 100" oninput="calcMarkup()" />
+          </div>
+          <div class="form-group" id="wrapper-venda" style="margin:0">
+            <label class="form-label">Venda Salão (R$)</label>
+            <input id="f-venda" class="form-input" type="text" placeholder="0,00" oninput="formatarValorMonetario(this)" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ingredientes / Composição</label>
+          <textarea id="f-desc" class="form-input" rows="2" placeholder="Descrição ou composição do produto..." style="resize:vertical"></textarea>
+        </div>
+
+        <!-- SESSÃO FISCAL -->
+        <div id="wrapper-fiscal" style="margin-top:20px;border-top:1px solid var(--border-soft);padding-top:20px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Informações Fiscais</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div class="form-group">
+              <label class="form-label">Grupo Tributário</label>
+              <select id="f-grupo-trib" class="form-input" style="cursor:pointer">
+                <option value="">Selecione o grupo</option>
+                <option>Tributado Integralmente</option>
+                <option>Isento</option>
+                <option>Substituição Tributária</option>
+                <option>Não Tributado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Origem do Produto</label>
+              <select id="f-origem" class="form-input" style="cursor:pointer">
+                <option value="0">0 - Nacional</option>
+                <option value="1">1 - Estrangeira (Importação Direta)</option>
+                <option value="2">2 - Estrangeira (Mercado Interno)</option>
+                <option value="3">3 - Nacional (Importação > 40%)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">NCM (Nomenclatura Comum do Mercosul)</label>
+            <input id="f-ncm" class="form-input" type="text" placeholder="Ex: 2106.90.90" />
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB FORNECEDORES -->
+      <div id="tab-fornecedores" class="tab-pane">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">Fornecedores Vinculados</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">Gerencie de quem você compra esta matéria prima.</div>
+          </div>
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:11px">＋ Vincular Fornecedor</button>
+        </div>
+        <div style="background:var(--card-bg);border:1px dashed var(--border-soft);border-radius:8px;padding:30px 20px;text-align:center;margin-bottom:24px">
+          <div style="font-size:20px;margin-bottom:8px">🏢</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text-mid)">Nenhum fornecedor</div>
+          <div style="font-size:11px;color:var(--text-dim)">Vincule fornecedores para facilitar pedidos de compra.</div>
+        </div>
+
+        <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px;border-top:1px solid var(--border-soft);padding-top:20px">Últimas Compras</div>
+        <div style="background:var(--card-bg);border:1px solid var(--border-soft);border-radius:8px;overflow:hidden">
+          <table style="width:100%;border-collapse:collapse">
+            <thead>
+              <tr style="background:rgba(0,0,0,0.15)">
+                <th style="padding:10px 14px;text-align:left;font-size:10px;color:var(--text-dim);text-transform:uppercase">Data</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;color:var(--text-dim);text-transform:uppercase">Fornecedor</th>
+                <th style="padding:10px 14px;text-align:left;font-size:10px;color:var(--text-dim);text-transform:uppercase">Qtd</th>
+                <th style="padding:10px 14px;text-align:right;font-size:10px;color:var(--text-dim);text-transform:uppercase">Custo Unit.</th>
+                <th style="padding:10px 14px;text-align:right;font-size:10px;color:var(--text-dim);text-transform:uppercase">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text-mid);border-top:1px solid var(--border-soft)">12/05/2026</td>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text);font-weight:600;border-top:1px solid var(--border-soft)">Distribuidora ABC</td>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text-mid);border-top:1px solid var(--border-soft)">10 KG</td>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text-mid);text-align:right;border-top:1px solid var(--border-soft)">R$ 15,00</td>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text);font-weight:600;text-align:right;border-top:1px solid var(--border-soft)">R$ 150,00</td>
+              </tr>
+              <tr>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text-dim);border-top:1px solid var(--border-soft)">28/04/2026</td>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text);font-weight:600;border-top:1px solid var(--border-soft)">Hortifruti Central</td>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text-dim);border-top:1px solid var(--border-soft)">15 KG</td>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text-dim);text-align:right;border-top:1px solid var(--border-soft)">R$ 14,50</td>
+                <td style="padding:12px 14px;font-size:12px;color:var(--text-mid);text-align:right;border-top:1px solid var(--border-soft)">R$ 217,50</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB ANÁLISE DE MATÉRIA PRIMA -->
+      <div id="tab-analise-materia" class="tab-pane">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">Análise de Uso (Fichas Técnicas)</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">Veja em quais produtos finais esta matéria prima é utilizada.</div>
+          </div>
+        </div>
+        <div style="background:var(--card-bg);border:1px solid var(--border-soft);border-radius:8px;padding:12px">
+          <div style="display:grid;grid-template-columns:1fr 100px;padding:8px;border-bottom:1px solid var(--border-soft);font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase">
+            <div>Produto Final</div>
+            <div style="text-align:right">Custo Gerado</div>
+          </div>
+          <div style="padding:24px 12px;text-align:center;color:var(--text-dim);font-size:12px">
+            <span style="font-size:16px;display:block;margin-bottom:6px">📊</span>
+            Nenhuma ficha técnica vinculada a este insumo ainda.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB FOTOS -->
+      <div id="tab-fotos" class="tab-pane">
+        <div style="border:2px dashed var(--border);border-radius:12px;padding:36px 24px;text-align:center;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)';this.style.background='rgba(232,160,32,0.03)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='transparent'">
+          <div style="font-size:32px;margin-bottom:12px">📸</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Arraste fotos ou clique para upload</div>
+          <div style="font-size:12px;color:var(--text-dim)">Formatos aceitos: JPG, PNG, WEBP (Máx: 2MB).<br>Recomendamos proporção 1:1 (quadrada) para o cardápio digital.</div>
+        </div>
+      </div>
+
+      <!-- TAB DELIVERY -->
+      <div id="tab-delivery" class="tab-pane">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px;margin-bottom:18px">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">Disponível no Delivery</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:2px">Exibido no cardápio digital de entrega</div>
+          </div>
+          <label class="tog">
+            <input type="checkbox" id="f-delivery" checked>
+            <span class="tog-track"></span>
+          </label>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:14px">
+          <div class="form-group">
+            <label class="form-label">Preço Delivery (R$)</label>
+            <input id="f-venda-delivery" class="form-input" type="text" placeholder="Igual Salão" oninput="formatarValorMonetario(this)" />
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:24px">Se vazio, usará o valor cadastrado na aba Geral.</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ingredientes / Composição</label>
+          <textarea id="f-ingredientes" class="form-input" rows="4" placeholder="Ex: Pão brioche, hambúrguer 160g, queijo cheddar, bacon, molho especial..." style="resize:vertical"></textarea>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:6px">Informação importante para clientes do delivery (alergias, etc).</div>
+        </div>
+      </div>
+
+      <!-- TAB COMPOSIÇÃO -->
+      <div id="tab-composicao" class="tab-pane">
+        
+        <!-- MODO PIZZA -->
+        <div style="background:rgba(232,160,32,0.05);border:1px solid rgba(232,160,32,0.2);border-radius:10px;padding:16px;margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--accent)">🍕 Configurações de Pizza</div>
+              <div style="font-size:11px;color:var(--text-dim);margin-top:2px">Ative para dividir sabores e cobrar bordas</div>
+            </div>
+            <label class="tog">
+              <input type="checkbox" id="f-is-pizza" onchange="document.getElementById('pizza-settings').style.display = this.checked ? 'block' : 'none'">
+              <span class="tog-track"></span>
+            </label>
+          </div>
+          <div id="pizza-settings" style="display:none;margin-top:14px;border-top:1px solid rgba(232,160,32,0.15);padding-top:14px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Cobrança de Meio a Meio</label>
+                <select class="form-input" style="cursor:pointer">
+                  <option>Pelo Maior Valor</option>
+                  <option>Média dos Valores (Soma/Qtd)</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;display:flex;align-items:center;gap:10px">
+                <input type="checkbox" id="f-borda" checked style="width:16px;height:16px;cursor:pointer">
+                <label for="f-borda" style="font-size:12px;color:var(--text);cursor:pointer">Permitir Adicionar Borda Recheada</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRUPOS DE ADICIONAIS -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Vincular Grupos de Composição</div>
+        </div>
+        
+        <div style="display:flex;gap:10px;margin-bottom:16px">
+          <select id="f-add-grupo" class="form-input" style="flex:1;cursor:pointer">
+            <option value="">Selecione um grupo para vincular...</option>
+          </select>
+          <button class="btn btn-ghost" style="padding:6px 16px" onclick="vincularGrupoProduto()">Vincular</button>
+        </div>
+
+        <div id="prod-grupos-vinculados" style="display:flex;flex-direction:column;gap:10px">
+          <!-- JS -->
+        </div>
+
+        <div style="border-top:1px solid var(--border-soft);margin-top:24px;padding-top:24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+            <div style="font-size:13px;font-weight:600;color:var(--text)">Criar Grupos Específicos Deste Produto</div>
+            <button class="btn btn-ghost" style="padding:4px 10px;font-size:12px" onclick="addAddonGroup()">＋ Criar Novo Grupo</button>
+          </div>
+          <div id="addons-container">
+            <!-- grupos criados manualmente do zero -->
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB FICHA TÉCNICA -->
+      <div id="tab-ficha" class="tab-pane">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <input class="form-input" placeholder="🔍 Buscar insumo para adicionar (Ex: Farinha)..." style="flex:1" />
+          <button class="btn btn-primary" style="padding:10px 14px">Adicionar</button>
+        </div>
+
+        <div style="border:1px solid var(--border-soft);border-radius:10px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:1fr 100px 100px 50px;background:rgba(0,0,0,0.2);padding:10px 16px;font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text-dim)">
+            <div>Insumo / Matéria Prima</div>
+            <div>Quantidade</div>
+            <div>Custo Est.</div>
+            <div style="text-align:center">Ação</div>
+          </div>
+          
+          <div style="display:grid;grid-template-columns:1fr 100px 100px 50px;align-items:center;padding:12px 16px;border-top:1px solid var(--border-soft);background:var(--card-bg)">
+            <div style="font-size:13px;font-weight:600">Pão Brioche (UN)</div>
+            <div><input class="form-input" style="padding:6px;font-size:12px;width:70px" value="1" type="number"></div>
+            <div style="font-size:12px;color:var(--text-mid)">R$ 1,20</div>
+            <div style="text-align:center"><button style="background:none;border:none;color:var(--danger);cursor:pointer">🗑</button></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 100px 100px 50px;align-items:center;padding:12px 16px;border-top:1px solid var(--border-soft);background:var(--card-bg)">
+            <div style="font-size:13px;font-weight:600">Carne Bovina Acém (KG)</div>
+            <div><input class="form-input" style="padding:6px;font-size:12px;width:70px" value="0.160" type="number" step="0.001"></div>
+            <div style="font-size:12px;color:var(--text-mid)">R$ 4,80</div>
+            <div style="text-align:center"><button style="background:none;border:none;color:var(--danger);cursor:pointer">🗑</button></div>
+          </div>
+          
+          <div style="padding:12px 16px;background:rgba(255,255,255,0.02);border-top:1px solid var(--border-soft);text-align:right">
+            <span style="font-size:12px;color:var(--text-dim)">Custo Total da Ficha: </span>
+            <span style="font-size:14px;font-weight:700;color:var(--accent);margin-left:6px">R$ 6,00</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:12px;text-align:center">
+          Os insumos listados serão baixados automaticamente do estoque a cada venda deste produto.
+        </div>
+      </div>
+
+      <!-- TAB ANÁLISE -->
+      <div id="tab-analise" class="tab-pane">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+          <div style="background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px;padding:16px">
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px">Vendas Totais (30 dias)</div>
+            <div style="font-size:24px;font-weight:700;color:var(--text)">142 <span style="font-size:14px;font-weight:400;color:var(--text-mid)">un.</span></div>
+            <div style="font-size:11px;color:var(--success);margin-top:4px">↗ 12% vs mês anterior</div>
+          </div>
+          <div style="background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px;padding:16px">
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:6px">Lucratividade Estimada</div>
+            <div style="font-size:24px;font-weight:700;color:var(--success)">55<span style="font-size:14px">%</span></div>
+            <div style="font-size:11px;color:var(--text-mid);margin-top:4px">Margem Bruta no Salão</div>
+          </div>
+        </div>
+
+        <div style="background:var(--card-bg);border:1px solid var(--border-soft);border-radius:10px;padding:16px;margin-bottom:20px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:16px">Desempenho por Canal</div>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
+            <div style="width:70px;font-size:12px;color:var(--text-mid)">Salão</div>
+            <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:4px;height:8px;overflow:hidden">
+              <div style="width:70%;background:var(--accent);height:100%;border-radius:4px"></div>
+            </div>
+            <div style="width:40px;font-size:12px;text-align:right">70%</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:14px">
+            <div style="width:70px;font-size:12px;color:var(--text-mid)">Delivery</div>
+            <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:4px;height:8px;overflow:hidden">
+              <div style="width:30%;background:#4a9ee0;height:100%;border-radius:4px"></div>
+            </div>
+            <div style="width:40px;font-size:12px;text-align:right">30%</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(232,160,32,0.05);border:1px solid rgba(232,160,32,0.2);border-radius:10px;padding:12px 16px;display:flex;gap:12px;align-items:flex-start">
+          <div style="font-size:18px">💡</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:4px">Insight do Sistema</div>
+            <div style="font-size:12px;color:var(--text-dim);line-height:1.4">Este produto tem ótima saída no Salão, mas o desempenho no Delivery está abaixo da média. Considere criar um combo ou destaque no cardápio digital.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MODAL FOOTER -->
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button onclick="closeProductDrawer()" class="btn btn-ghost" style="padding:10px 24px">Cancelar</button>
+      <button onclick="saveProduct()" class="btn btn-primary" style="padding:10px 32px">Salvar Produto</button>
+    </div>
+  </div>
+
+  <!-- CARDÁPIO → CATEGORIAS -->
+  <div class="page" id="page-cardapio-categorias">
+    <div class="page-header">
+      <div><div class="page-title">Categorias</div><div class="page-sub">Organize as seções do cardápio</div></div>
+      <button class="btn btn-primary">＋ Nova Categoria</button>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Categoria</th><th>Produtos</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody>
+          <tr><td>🍽️ Pratos Principais</td><td>24</td><td><span class="status-pill active-s">Ativo</span></td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:12px">Editar</button></td></tr>
+          <tr><td>🥗 Entradas</td><td>12</td><td><span class="status-pill active-s">Ativo</span></td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:12px">Editar</button></td></tr>
+          <tr><td>🍕 Pizzas</td><td>18</td><td><span class="status-pill active-s">Ativo</span></td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:12px">Editar</button></td></tr>
+          <tr><td>🍰 Sobremesas</td><td>8</td><td><span class="status-pill pending">Inativo</span></td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:12px">Editar</button></td></tr>
+          <tr><td>🍺 Bebidas</td><td>32</td><td><span class="status-pill active-s">Ativo</span></td><td><button class="btn btn-ghost" style="padding:5px 12px;font-size:12px">Editar</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PEDIDOS → LISTA -->
+  <div class="page" id="page-pedidos-lista">
+    <div class="page-header">
+      <div><div class="page-title">Pedidos</div><div class="page-sub">Todos os pedidos do dia</div></div>
+      <button class="btn btn-primary">＋ Novo Pedido</button>
+    </div>
+    <div class="search-bar">
+      <input class="search-input" placeholder="🔍  Buscar pedidos..." />
+      <button class="btn btn-ghost">Hoje</button>
+      <button class="btn btn-ghost">Filtros</button>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>#</th><th>Cliente/Mesa</th><th>Itens</th><th>Total</th><th>Hora</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--accent);font-weight:700">#344</td><td>Delivery</td><td>3 itens</td><td>R$ 119,70</td><td>14:32</td><td><span class="status-pill pending">Preparo</span></td></tr>
+          <tr><td style="color:var(--accent);font-weight:700">#343</td><td>Mesa 2</td><td>3 itens</td><td>R$ 94,80</td><td>14:28</td><td><span class="status-pill active-s">Pronto</span></td></tr>
+          <tr><td style="color:var(--accent);font-weight:700">#342</td><td>Mesa 5</td><td>3 itens</td><td>R$ 74,70</td><td>14:20</td><td><span class="status-pill pending">Preparo</span></td></tr>
+          <tr><td style="color:var(--accent);font-weight:700">#341</td><td>Mesa 8</td><td>4 itens</td><td>R$ 138,60</td><td>14:05</td><td><span class="status-pill inactive">Cancelado</span></td></tr>
+          <tr><td style="color:var(--accent);font-weight:700">#340</td><td>Mesa 1</td><td>2 itens</td><td>R$ 49,80</td><td>13:50</td><td><span class="status-pill active-s">Entregue</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PEDIDOS → DELIVERY -->
+  <div class="page" id="page-pedidos-delivery">
+    <div class="page-header">
+      <div><div class="page-title">Delivery</div><div class="page-sub">Pedidos para entrega</div></div>
+      <button class="btn btn-primary">＋ Novo Delivery</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Em Rota</div><div class="stat-value">5</div></div>
+      <div class="stat-card"><div class="stat-label">Aguardando</div><div class="stat-value">3</div></div>
+      <div class="stat-card"><div class="stat-label">Entregues Hoje</div><div class="stat-value">42</div></div>
+      <div class="stat-card"><div class="stat-label">Tempo Médio</div><div class="stat-value">28min</div></div>
+    </div>
+    <div class="order-item">
+      <div class="order-num">#344</div>
+      <div class="order-info"><div class="order-name">João Silva — Rua das Flores, 123</div><div class="order-detail">3x Pizza Calabresa • R$119,70</div></div>
+      <div class="order-time">22min</div>
+      <span class="status-pill pending">Preparo</span>
+    </div>
+    <div class="order-item">
+      <div class="order-num">#338</div>
+      <div class="order-info"><div class="order-name">Maria Santos — Av. Brasil, 450</div><div class="order-detail">1x Filé, 2x Suco • R$89,80</div></div>
+      <div class="order-time">35min</div>
+      <span class="status-pill active-s">Em Rota</span>
+    </div>
+  </div>
+
+  <!-- COZINHA → COMANDAS -->
+  <div class="page" id="page-cozinha-comandas">
+    <div class="page-header">
+      <div><div class="page-title">Comandas</div><div class="page-sub">Fila de preparo em tempo real</div></div>
+      <button class="btn btn-ghost">🔄 Atualizar</button>
+    </div>
+    <div class="three-col">
+      <div class="card">
+        <div class="card-header" style="background:rgba(224,92,74,0.08)"><span class="card-title">🔴 Aguardando (4)</span></div>
+        <div style="padding:12px">
+          <div class="order-item" style="flex-direction:column;align-items:flex-start">
+            <div style="display:flex;justify-content:space-between;width:100%;margin-bottom:8px"><span style="color:var(--accent);font-weight:700">#342</span><span style="font-size:12px;color:var(--text-dim)">14min</span></div>
+            <div style="font-size:13px;color:var(--text-mid)">• 2x Frango Grelhado<br>• 1x Arroz Integral<br>• 1x Suco Laranja</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header" style="background:rgba(232,160,32,0.08)"><span class="card-title">🟡 Em Preparo (2)</span></div>
+        <div style="padding:12px">
+          <div class="order-item" style="flex-direction:column;align-items:flex-start">
+            <div style="display:flex;justify-content:space-between;width:100%;margin-bottom:8px"><span style="color:var(--accent);font-weight:700">#340</span><span style="font-size:12px;color:var(--text-dim)">8min</span></div>
+            <div style="font-size:13px;color:var(--text-mid)">• 1x Filé Mignon<br>• 1x Batata Frita</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header" style="background:rgba(92,184,92,0.08)"><span class="card-title">🟢 Prontos (3)</span></div>
+        <div style="padding:12px">
+          <div class="order-item" style="flex-direction:column;align-items:flex-start">
+            <div style="display:flex;justify-content:space-between;width:100%;margin-bottom:8px"><span style="color:var(--accent);font-weight:700">#343</span><span style="font-size:12px;color:var(--text-dim)">2min</span></div>
+            <div style="font-size:13px;color:var(--text-mid)">• 2x Salada Caesar<br>• 1x Refrigerante</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESAS -->
+  <div class="page" id="page-mesas-mapa">
+    <div class="page-header">
+      <div><div class="page-title">Mapa de Mesas</div><div class="page-sub">Ocupação em tempo real</div></div>
+      <button class="btn btn-primary">＋ Adicionar Mesa</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px">
+      ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20].map(n => {
+        const states = ['occupied','occupied','free','occupied','free','occupied','free','free','occupied','occupied','occupied','free','occupied','occupied','free','free','occupied','free','occupied','free'];
+        const s = states[n-1];
+        const bg = s === 'occupied' ? 'rgba(232,160,32,0.12)' : 'rgba(92,184,92,0.08)';
+        const bc = s === 'occupied' ? 'rgba(232,160,32,0.3)' : 'rgba(92,184,92,0.3)';
+        const ic = s === 'occupied' ? '🔴' : '🟢';
+        return `<div style="background:${bg};border:1px solid ${bc};border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+          <div style="font-size:20px;margin-bottom:4px">${ic}</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M${n}</div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:2px">${s === 'occupied' ? '4 pessoas' : 'Livre'}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+
+  <!-- ESTOQUE -->
+  <div class="page" id="page-estoque-produtos">
+    <div class="page-header">
+      <div><div class="page-title">Estoque</div><div class="page-sub">Controle de insumos e ingredientes</div></div>
+      <button class="btn btn-primary">＋ Entrada</button>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>Produto</th><th>Categoria</th><th>Qtd Atual</th><th>Mínimo</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>🧅 Cebola</td><td>Legumes</td><td>12 kg</td><td>5 kg</td><td><span class="status-pill active-s">OK</span></td></tr>
+          <tr><td>🥩 Filé Mignon</td><td>Carnes</td><td>3,2 kg</td><td>5 kg</td><td><span class="status-pill inactive">Baixo</span></td></tr>
+          <tr><td>🧄 Alho</td><td>Condimentos</td><td>2,1 kg</td><td>1 kg</td><td><span class="status-pill active-s">OK</span></td></tr>
+          <tr><td>🫒 Azeite Extra Virgem</td><td>Óleos</td><td>1,5 L</td><td>3 L</td><td><span class="status-pill inactive">Baixo</span></td></tr>
+          <tr><td>🍅 Molho de Tomate</td><td>Molhos</td><td>18 L</td><td>10 L</td><td><span class="status-pill active-s">OK</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FINANCEIRO -->
+  <div class="page" id="page-financeiro-caixa">
+    <div class="page-header">
+      <div><div class="page-title">Caixa</div><div class="page-sub">Movimentação financeira do dia</div></div>
+      <button class="btn btn-primary">Fechar Caixa</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Saldo Abertura</div><div class="stat-value">R$500</div></div>
+      <div class="stat-card"><div class="stat-label">Entradas</div><div class="stat-value" style="color:var(--success)">R$4.820</div></div>
+      <div class="stat-card"><div class="stat-label">Saídas</div><div class="stat-value" style="color:var(--danger)">R$1.240</div></div>
+      <div class="stat-card"><div class="stat-label">Saldo Atual</div><div class="stat-value" style="color:var(--accent)">R$4.080</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Últimas Transações</span></div>
+      <table>
+        <thead><tr><th>Descrição</th><th>Tipo</th><th>Valor</th><th>Hora</th></tr></thead>
+        <tbody>
+          <tr><td>Pedido #343</td><td><span class="status-pill active-s">Entrada</span></td><td style="color:var(--success)">+R$94,80</td><td>14:28</td></tr>
+          <tr><td>Fornecedor Hortifruti</td><td><span class="status-pill inactive">Saída</span></td><td style="color:var(--danger)">-R$380,00</td><td>13:15</td></tr>
+          <tr><td>Pedido #341</td><td><span class="status-pill active-s">Entrada</span></td><td style="color:var(--success)">+R$138,60</td><td>14:05</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RELATÓRIOS -->
+  <div class="page" id="page-relatorios-vendas">
+    <div class="page-header">
+      <div><div class="page-title">Relatório de Vendas</div><div class="page-sub">Análise detalhada do desempenho</div></div>
+      <button class="btn btn-ghost">📥 Exportar</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Esta Semana</div><div class="stat-value">R$28.400</div><div class="stat-change up">▲ 14%</div></div>
+      <div class="stat-card"><div class="stat-label">Este Mês</div><div class="stat-value">R$112k</div><div class="stat-change up">▲ 8%</div></div>
+      <div class="stat-card"><div class="stat-label">Pedidos/Dia</div><div class="stat-value">143</div><div class="stat-change up">▲ 5%</div></div>
+      <div class="stat-card"><div class="stat-label">Satisfação</div><div class="stat-value">4.8⭐</div><div class="stat-change up">▲ 0,2</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Vendas por Dia — Últimos 7 dias</span></div>
+      <div style="padding:24px">
+        <div style="display:flex;align-items:flex-end;gap:12px;height:120px">
+          ${[3200,4100,3800,4500,3900,4820,0].map((v,i) => {
+            const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+            const h = v ? Math.round((v/4820)*100) : 4;
+            const active = i === 5;
+            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+              <div style="font-size:10px;color:var(--text-dim)">R$${v ? (v/1000).toFixed(1)+'k' : '--'}</div>
+              <div style="width:100%;height:${h}%;background:${active ? 'var(--accent)' : 'rgba(232,160,32,0.2)'};border-radius:6px 6px 0 0;transition:height 0.3s"></div>
+              <div style="font-size:10px;color:${active?'var(--accent)':'var(--text-dim)'}">${days[i]}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIGURAÇÕES -->
+  <div class="page" id="page-configuracoes-geral">
+    <div class="page-header">
+      <div><div class="page-title">Configurações</div><div class="page-sub">Personalize seu estabelecimento</div></div>
+      <button class="btn btn-primary">Salvar</button>
+    </div>
+    <div class="two-col">
+      <div class="card" style="padding:24px">
+        <div class="card-title" style="margin-bottom:20px">Dados do Estabelecimento</div>
+        <div class="form-group"><label class="form-label">Nome</label><input class="form-input" value="Restaurante FoodFlow" /></div>
+        <div class="form-group"><label class="form-label">CNPJ</label><input class="form-input" value="12.345.678/0001-99" /></div>
+        <div class="form-group"><label class="form-label">Telefone</label><input class="form-input" value="(11) 99999-9999" /></div>
+        <div class="form-group"><label class="form-label">Endereço</label><input class="form-input" value="Rua das Flores, 123 — SP" /></div>
+      </div>
+      <div class="card" style="padding:24px">
+        <div class="card-title" style="margin-bottom:20px">Horário de Funcionamento</div>
+        <div class="form-group"><label class="form-label">Segunda a Sexta</label><input class="form-input" value="11:00 - 23:00" /></div>
+        <div class="form-group"><label class="form-label">Sábado</label><input class="form-input" value="11:00 - 00:00" /></div>
+        <div class="form-group"><label class="form-label">Domingo</label><input class="form-input" value="12:00 - 22:00" /></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETUP COMANDAS -->
+  <div class="page" id="page-vendas-comandas">
+    <div class="page-header">
+      <div><div class="page-title">Configurar Comandas</div><div class="page-sub">Geração do lote de comandas físicas</div></div>
+    </div>
+    <div class="card" style="padding:24px;max-width:500px">
+      <div class="form-group">
+        <label class="form-label">Quantidade de Comandas</label>
+        <input type="number" id="f-qtd-comandas" class="form-input" placeholder="Ex: 50" value="50" />
+      </div>
+      <button class="btn btn-primary" onclick="gerarComandas()">Gerar Comandas</button>
+      <div id="comandas-status" style="margin-top:16px;font-size:13px;color:var(--text-dim)"></div>
+    </div>
+  </div>
+
+  <!-- SETUP MESAS -->
+  <div class="page" id="page-vendas-mesas">
+    <div class="page-header">
+      <div><div class="page-title">Configurar Mesas</div><div class="page-sub">Geração do mapa de mesas</div></div>
+    </div>
+    <div class="card" style="padding:24px;max-width:500px">
+      <div class="form-group">
+        <label class="form-label">Quantidade de Mesas</label>
+        <input type="number" id="f-qtd-mesas" class="form-input" placeholder="Ex: 20" value="20" />
+      </div>
+      <button class="btn btn-primary" onclick="gerarMesas()">Gerar Mesas</button>
+      <div id="mesas-status" style="margin-top:16px;font-size:13px;color:var(--text-dim)"></div>
+    </div>
+  </div>
+
+  <!-- CAIXA (PDV) -->
+  <div class="page" id="page-vendas-caixa" style="padding:0;height:100vh;flex-direction:column">
+    <div class="page-header" style="padding:16px 24px;border-bottom:1px solid var(--border-soft);margin-bottom:0;display:flex;justify-content:space-between;align-items:center;background:var(--card-bg);">
+      <div style="width:250px">
+        <div class="page-title" style="font-size:20px">Frente de Caixa</div>
+        <div class="page-sub" id="caixa-status-label" style="font-size:11px">Status: Fechado</div>
+      </div>
+      
+      <div style="flex:1;display:flex;justify-content:center">
+        <div style="display:inline-flex;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.05);border-radius:100px;padding:6px;gap:4px;box-shadow:inset 0 2px 10px rgba(0,0,0,0.5)">
+          <div class="futuristic-tab active" onclick="switchCaixaTab('venda-direta', this)">💳 Venda Direta</div>
+          <div class="futuristic-tab" onclick="switchCaixaTab('comandas', this)">📋 Comandas</div>
+          <div class="futuristic-tab" onclick="switchCaixaTab('mesas', this)">🪑 Mesas</div>
+          <div class="futuristic-tab" onclick="switchCaixaTab('balcao', this)">🥡 Balcão</div>
+        </div>
+      </div>
+
+      <div style="width:250px;display:flex;justify-content:flex-end;gap:12px">
+        <div style="position:relative">
+          <button class="btn btn-ghost" id="btn-acoes-caixa" onclick="toggleMenuAcoesCaixa()" style="display:none">⚙️ Ações do Caixa</button>
+          <div id="menu-acoes-caixa" style="position:absolute;top:100%;right:0;margin-top:8px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);min-width:200px;display:none;z-index:100;overflow:hidden">
+            <button style="width:100%;padding:12px 16px;border:none;background:none;color:var(--text);text-align:left;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border-soft);transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'" onclick="abrirSangria()">💸 Sangria de Caixa</button>
+            <button style="width:100%;padding:12px 16px;border:none;background:none;color:var(--text);text-align:left;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border-soft);transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='none'" onclick="abrirSuprimento()">📥 Suprimento</button>
+            <button style="width:100%;padding:12px 16px;border:none;background:none;color:var(--danger);text-align:left;cursor:pointer;font-size:13px;transition:background 0.2s" onmouseover="this.style.background='rgba(224,92,74,0.1)'" onmouseout="this.style.background='none'" onclick="fecharCaixa()">🔒 Fechar Caixa</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CAIXA TABS -->
+    <div style="flex:1;position:relative;overflow:hidden">
+      <!-- OVERLAY DE CAIXA FECHADO -->
+      <div id="caixa-overlay" style="position:absolute;inset:0;background:rgba(20,18,16,0.9);z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:48px;margin-bottom:16px">🔒</div>
+        <h2 style="font-family:'Playfair Display',serif;margin-bottom:8px">Caixa Fechado</h2>
+        <p style="color:var(--text-dim);margin-bottom:24px;font-size:14px">Abra o caixa para iniciar as vendas</p>
+        <div class="card" style="padding:24px;width:300px">
+          <div class="form-group">
+            <label class="form-label">Fundo de Troco Inicial (R$)</label>
+            <input type="text" id="f-fundo-troco" class="form-input" placeholder="0,00" value="0,00" data-inicial="true" oninput="formatarValorMonetario(this)" />
+          </div>
+          <button class="btn btn-primary" style="width:100%" onclick="abrirCaixa()">Abrir Caixa</button>
+        </div>
+      </div>
+
+      <!-- OVERLAY FECHAMENTO DE CAIXA (APURAÇÃO) -->
+      <div id="fechamento-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.8);z-index:51;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s">
+        <div id="fechamento-modal" class="card" style="width:400px;padding:0;transform:translateY(20px);transition:transform 0.3s;max-height:90vh;display:flex;flex-direction:column">
+          <div style="padding:20px;border-bottom:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center">
+            <h3 style="margin:0;font-family:'Playfair Display',serif">Apuração de Caixa</h3>
+            <button onclick="cancelarFechamento()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px">✕</button>
+          </div>
+          <div style="padding:20px;overflow-y:auto;flex:1">
+            <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.4">Informe os valores contados na gaveta e nas maquininhas para registrar o fechamento. Deixe em branco se for zero.</p>
+            <div id="fechamento-pagamentos-container" style="margin-bottom:20px"></div>
+            
+            <div style="border-top:1px dashed var(--border-soft);padding-top:20px;margin-bottom:20px">
+              <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+                <span style="font-weight:600;font-size:14px">Acerto com Entregadores?</span>
+                <label class="tog" style="margin:0">
+                  <input type="checkbox" id="chk-fechamento-entregadores" onchange="toggleFechamentoEntregadores()">
+                  <span class="tog-track"></span>
+                </label>
+              </label>
+              <div id="fechamento-entregadores-container" style="display:none;margin-top:16px;background:var(--card-bg);padding:12px;border-radius:8px;border:1px solid var(--border-soft)">
+              </div>
+            </div>
+            
+            <button class="btn btn-ghost" style="width:100%;border:1px solid var(--border-soft);margin-bottom:8px" onclick="imprimirRelatorioEntregadores()">🖨️ Relatório de Entregas</button>
+          </div>
+          <div style="padding:20px;border-top:1px solid var(--border-soft);background:rgba(0,0,0,0.2)">
+            <button class="btn btn-primary" style="width:100%" onclick="confirmarFechamentoCaixa()">Confirmar e Fechar Caixa</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OVERLAY SANGRIA DE CAIXA -->
+      <div id="sangria-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.8);z-index:51;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s">
+        <div id="sangria-modal" class="card" style="width:400px;padding:0;transform:translateY(20px);transition:transform 0.3s">
+          <div style="padding:20px;border-bottom:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center">
+            <h3 style="margin:0;font-family:'Playfair Display',serif">💸 Sangria de Caixa</h3>
+            <button onclick="cancelarSangria()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px">✕</button>
+          </div>
+          <div style="padding:20px">
+            <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.4">Registre o valor retirado do caixa para segurança e movimentação.</p>
+            
+            <div class="form-group">
+              <label class="form-label">Valor a Retirar (R$)</label>
+              <input type="text" id="f-sangria-valor" class="form-input" placeholder="0,00" data-inicial="true" oninput="formatarValorMonetario(this)" />
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Motivo</label>
+              <select id="f-sangria-motivo" class="form-input" style="cursor:pointer">
+                <option value="">Selecione um motivo</option>
+                <option value="seguranca">Segurança</option>
+                <option value="movimentacao">Movimentação</option>
+                <option value="deposito">Depósito</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Observações</label>
+              <textarea id="f-sangria-obs" class="form-input" rows="3" placeholder="Observações adicionais..." style="resize:vertical"></textarea>
+            </div>
+          </div>
+          <div style="padding:20px;border-top:1px solid var(--border-soft);background:rgba(0,0,0,0.2);display:flex;gap:12px">
+            <button class="btn btn-ghost" style="flex:1" onclick="cancelarSangria()">Cancelar</button>
+            <button class="btn btn-primary" style="flex:1" onclick="confirmarSangria()">Registrar Sangria</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OVERLAY SUPRIMENTO -->
+      <div id="suprimento-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.8);z-index:51;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s">
+        <div id="suprimento-modal" class="card" style="width:400px;padding:0;transform:translateY(20px);transition:transform 0.3s">
+          <div style="padding:20px;border-bottom:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center">
+            <h3 style="margin:0;font-family:'Playfair Display',serif">📥 Suprimento</h3>
+            <button onclick="cancelarSuprimento()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px">✕</button>
+          </div>
+          <div style="padding:20px">
+            <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.4">Registre o valor adicionado ao caixa para reposição.</p>
+            
+            <div class="form-group">
+              <label class="form-label">Valor a Adicionar (R$)</label>
+              <input type="text" id="f-suprimento-valor" class="form-input" placeholder="0,00" data-inicial="true" oninput="formatarValorMonetario(this)" />
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Origem</label>
+              <select id="f-suprimento-origem" class="form-input" style="cursor:pointer">
+                <option value="">Selecione a origem</option>
+                <option value="gerente">Gerente</option>
+                <option value="caixa-principal">Caixa Principal</option>
+                <option value="banco">Banco</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Observações</label>
+              <textarea id="f-suprimento-obs" class="form-input" rows="3" placeholder="Observações adicionais..." style="resize:vertical"></textarea>
+            </div>
+          </div>
+          <div style="padding:20px;border-top:1px solid var(--border-soft);background:rgba(0,0,0,0.2);display:flex;gap:12px">
+            <button class="btn btn-ghost" style="flex:1" onclick="cancelarSuprimento()">Cancelar</button>
+            <button class="btn btn-primary" style="flex:1" onclick="confirmarSuprimento()">Registrar Suprimento</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VENDA DIRETA -->
+      <div class="caixa-pane active" id="pane-venda-direta" style="display:flex;height:100%">
+        <!-- LISTA PRODUTOS E NAVEGAÇÃO -->
+        <div style="flex:2;padding:24px;overflow-y:auto;border-right:1px solid var(--border-soft);display:flex;flex-direction:column">
+           <div style="display:flex;gap:16px;margin-bottom:20px;align-items:center">
+             <button class="btn btn-ghost" id="pdv-btn-voltar" style="display:none;padding:8px 12px" onclick="pdvVoltar()">← Voltar</button>
+             <input type="text" id="pdv-search" class="form-input" placeholder="Buscar produto..." style="flex:1" oninput="handlePDVSearch()" />
+           </div>
+           <!-- NAV BREADCRUMB -->
+           <div id="pdv-breadcrumb" style="font-size:14px;color:var(--text-dim);margin-bottom:16px;font-weight:600">Categorias</div>
+           <!-- GRID DE ITENS (Cats, Subcats, Prods) -->
+           <div id="pdv-products-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:16px;flex:1;align-content:flex-start"></div>
+        </div>
+        <!-- CARRINHO -->
+        <div style="flex:1;background:var(--sidebar-bg);display:flex;flex-direction:column">
+           <div style="padding:20px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between;align-items:center">
+             <span id="pdv-cart-title">Cupom (Venda Direta)</span>
+             <button id="pdv-btn-close-comanda" class="btn btn-ghost" style="display:none;padding:4px 8px;font-size:11px" onclick="switchCaixaTab('comandas', document.querySelector('.modal-tab:nth-child(2)'))">Sair da Comanda</button>
+           </div>
+           <div id="pdv-cart" style="flex:1;overflow-y:auto;padding:20px">
+             <div class="empty-state" style="padding:40px 0"><p>Carrinho vazio</p></div>
+           </div>
+           <div style="padding:20px;border-top:1px solid var(--border-soft)">
+             <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:18px;font-weight:600;color:var(--accent)">
+               <span>Total</span>
+               <span id="pdv-total">R$ 0,00</span>
+             </div>
+             
+             <!-- BOTOES DE ACAO DO CARRINHO -->
+             <div id="pdv-cart-actions-direta" style="display:flex;flex-direction:column">
+               <button class="btn btn-primary" style="width:100%;padding:14px" onclick="finalizarVendaDireta()">Finalizar Venda</button>
+             </div>
+             <div id="pdv-cart-actions-comanda" style="display:none;flex-direction:column;gap:8px">
+               <button id="btn-lancar-itens" class="btn btn-primary" style="width:100%" onclick="salvarItensComanda()">Lançar Itens na Comanda</button>
+               <button id="btn-pre-fechamento" class="btn btn-ghost" style="width:100%;background:rgba(92,184,92,0.1);color:var(--success)" onclick="preFechamentoComanda()">Imprimir Pré-fechamento</button>
+               <button id="btn-finalizar-comanda" class="btn btn-primary" style="width:100%;background:var(--success);border-color:var(--success)" onclick="finalizarComanda()">Finalizar e Receber</button>
+               <button id="btn-bloquear-comanda" class="btn btn-ghost" style="width:100%;color:var(--danger);border:1px solid var(--danger)" onclick="bloquearComanda()">Bloquear Comanda (Perda/Roubo)</button>
+               <button id="btn-desbloquear-comanda" class="btn btn-ghost" style="width:100%;display:none;color:var(--accent);border:1px dashed var(--accent)" onclick="desbloquearComanda()">Desbloquear Comanda</button>
+             </div>
+           </div>
+        </div>
+      </div>
+
+      <!-- COMANDAS -->
+      <div class="caixa-pane" id="pane-comandas" style="display:none;padding:24px;height:100%;overflow-y:auto;flex-direction:column">
+        <div id="pdv-comandas-metrics" style="display:flex;gap:16px;margin-bottom:20px"></div>
+        <div id="pdv-comandas-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(110px, 1fr));gap:16px"></div>
+      </div>
+
+      <!-- MESAS -->
+      <div class="caixa-pane" id="pane-mesas" style="display:none;padding:24px;height:100%;overflow-y:auto">
+        <div id="pdv-mesas-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(120px, 1fr));gap:16px"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL ADD PRODUTO PDV -->
+  <div class="modal-overlay" id="pdv-modal-overlay"></div>
+  <div class="modal" id="pdv-modal-produto" style="width:500px">
+    <div class="modal-header">
+      <div>
+        <h3 id="pdv-modal-title" style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px">Nome do Produto</h3>
+        <div id="pdv-modal-price" style="color:var(--accent);font-weight:600;font-size:14px">R$ 0,00</div>
+      </div>
+      <button class="btn btn-ghost" onclick="fecharModalProdutoPDV()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:16px">
+      
+      <!-- COMPOSITIONS CONTAINER -->
+      <div id="pdv-modal-compositions"></div>
+
+      <!-- OBSERVAÇÃO -->
+      <div class="form-group" style="margin-top:20px">
+        <label class="form-label">Observação</label>
+        <textarea id="pdv-modal-obs" class="form-input" style="height:80px;resize:none" placeholder="Ex: Sem cebola, ponto da carne..."></textarea>
+      </div>
+
+    </div>
+    <div class="modal-footer" style="justify-content:space-between;align-items:center">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost" style="padding:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--border-soft)" onclick="alterarQtdPDV(-1)">-</button>
+        <span id="pdv-modal-qtd" style="font-weight:600;font-size:16px;width:24px;text-align:center">1</span>
+        <button class="btn btn-ghost" style="padding:0;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid var(--border-soft)" onclick="alterarQtdPDV(1)">+</button>
+      </div>
+      <button class="btn btn-primary" onclick="confirmarProdutoPDV()">Adicionar</button>
+    </div>
+  </div>
+
+  <!-- MODAL DETALHES MESA -->
+  <div class="modal-overlay" id="modal-detalhes-mesa-overlay"></div>
+  <div class="modal" id="modal-detalhes-mesa" style="width:400px">
+    <div class="modal-header">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px" id="lbl-detalhes-mesa">Mesa 0</h3>
+      <button class="btn btn-ghost" onclick="fecharModalDetalhesMesa()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;color:var(--text-dim);margin-bottom:12px;font-weight:600">Comandas Vinculadas</div>
+      <div id="detalhes-mesa-comandas" style="margin-bottom:16px;display:flex;flex-direction:column;gap:8px"></div>
+      <button class="btn btn-ghost" style="width:100%;border:1px dashed var(--border-soft);color:var(--accent)" onclick="abrirModalVincularMesaNaMesa()">+ Adicionar Comanda à Mesa</button>
+    </div>
+  </div>
+
+  <!-- MODAL ABRIR COMANDA -->
+  <div class="modal-overlay" id="modal-abrir-comanda-overlay"></div>
+  <div class="modal" id="modal-abrir-comanda" style="width:400px">
+    <div class="modal-header">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px" id="lbl-abrir-comanda">Abrir Comanda</h3>
+      <button class="btn btn-ghost" onclick="fecharModalAbrirComanda()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome do Cliente (opcional)</label>
+        <input type="text" id="f-comanda-cliente" class="form-input" placeholder="Ex: João" />
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label">Telefone (opcional)</label>
+        <input type="text" id="f-comanda-telefone" class="form-input" placeholder="(00) 00000-0000" />
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label">CPF (opcional)</label>
+        <input type="text" id="f-comanda-cpf" class="form-input" placeholder="000.000.000-00" />
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="fecharModalAbrirComanda()">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarAbrirComanda()">Confirmar</button>
+    </div>
+  </div>
+
+  <!-- MODAL VINCULAR MESA -->
+  <div class="modal-overlay" id="modal-vincular-mesa-overlay"></div>
+  <div class="modal" id="modal-vincular-mesa" style="width:400px">
+    <div class="modal-header">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px" id="lbl-vincular-mesa">Vincular Mesa</h3>
+      <button class="btn btn-ghost" onclick="fecharModalVincularMesa()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Número da Comanda</label>
+        <input type="number" id="f-mesa-comanda-id" class="form-input" placeholder="Ex: 5" />
+      </div>
+      <div class="form-group" id="f-mesa-cliente-wrapper" style="display:none;margin-top:16px">
+        <label class="form-label">Nome do Cliente (opcional)</label>
+        <input type="text" id="f-mesa-cliente-nome" class="form-input" placeholder="Ex: Maria" />
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="fecharModalVincularMesa()">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarVincularMesa()">Vincular</button>
+    </div>
+  </div>
+
+  <!-- MODAL BALCÃO -->
+  <div class="modal-overlay" id="modal-balcao-overlay"></div>
+  <div class="modal" id="modal-balcao" style="width:400px">
+    <div class="modal-header">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px">Novo Pedido Balcão</h3>
+      <button class="btn btn-ghost" onclick="fecharModalBalcao()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:12px;margin-bottom:20px">
+        <label style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:8px;cursor:pointer">
+          <input type="radio" name="balcao-tipo" value="comer_aqui" checked onchange="toggleBalcaoTipo()" style="margin-bottom:8px" />
+          <span style="font-weight:600">Comer Aqui</span>
+        </label>
+        <label style="flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;background:var(--card-bg);border:1px solid var(--border-soft);border-radius:8px;cursor:pointer">
+          <input type="radio" name="balcao-tipo" value="viagem" onchange="toggleBalcaoTipo()" style="margin-bottom:8px" />
+          <span style="font-weight:600">Para Viagem</span>
+        </label>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Nome do Cliente</label>
+        <input type="text" id="f-balcao-nome" class="form-input" placeholder="Ex: Maria" />
+      </div>
+      
+
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="fecharModalBalcao()">Cancelar</button>
+      <button class="btn btn-primary" onclick="confirmarBalcao()">Iniciar Venda</button>
+    </div>
+  </div>
+
+  <!-- MODAL DETALHES DELIVERY -->
+  <div class="modal-overlay" id="modal-detalhes-delivery-overlay"></div>
+  <div class="modal" id="modal-detalhes-delivery" style="width:500px">
+    <div class="modal-header">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px" id="lbl-detalhes-delivery-id">Pedido #0000</h3>
+      <button class="btn btn-ghost" onclick="fecharModalDetalhesDelivery()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span id="lbl-detalhes-delivery-tipo" style="background:var(--accent);color:#000;padding:4px 12px;border-radius:100px;font-weight:bold;font-size:12px">Entrega</span>
+        <span id="lbl-detalhes-delivery-hora" style="font-size:12px;color:var(--text-dim)">14:20</span>
+      </div>
+      
+      <div class="card" style="padding:16px;background:rgba(255,255,255,0.02)">
+        <div style="font-weight:600;font-size:16px;color:var(--text)" id="lbl-detalhes-delivery-cliente">Nome do Cliente</div>
+        <div style="font-size:13px;margin-top:8px">
+          <a href="#" target="_blank" id="lbl-detalhes-delivery-tel-link" style="color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:6px">
+            <span style="font-size:16px">💬</span> <span id="lbl-detalhes-delivery-tel">(00) 00000-0000</span>
+          </a>
+        </div>
+        <div style="font-size:13px;margin-top:8px">
+          <a href="#" target="_blank" id="lbl-detalhes-delivery-end-link" style="color:var(--accent);text-decoration:none;display:inline-flex;align-items:center;gap:6px">
+            <span style="font-size:16px">📍</span> <span id="lbl-detalhes-delivery-end">Rua das Flores, 123</span>
+          </a>
+        </div>
+        <div id="box-entregador-delivery" class="form-group" style="margin-top:16px;padding-top:12px;border-top:1px dashed var(--border-soft)">
+          <label class="form-label">Entregador Responsável</label>
+          <select id="f-detalhes-delivery-entregador" class="form-input" style="cursor:pointer" onchange="salvarEntregadorDelivery(this.value)">
+            <option value="">Nenhum</option>
+          </select>
+        </div>
+      </div>
+      
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:8px">ITENS DO PEDIDO</div>
+        <div id="detalhes-delivery-itens" style="display:flex;flex-direction:column;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--border-soft)">
+        </div>
+      </div>
+      
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        <div style="font-size:13px;color:var(--text-dim)">Subtotal: <span id="lbl-detalhes-delivery-sub" style="color:var(--text);margin-left:8px">R$ 0,00</span></div>
+        <div style="font-size:13px;color:var(--text-dim)">Taxa de Entrega: <span id="lbl-detalhes-delivery-taxa" style="color:var(--text);margin-left:8px">R$ 0,00</span></div>
+        <div style="font-size:16px;font-weight:bold;color:var(--accent);margin-top:4px">Total: <span id="lbl-detalhes-delivery-total" style="margin-left:8px">R$ 0,00</span></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn btn-ghost" onclick="alterarPedidoDelivery()" style="border:1px solid var(--border-soft)">✏️ Alterar Pedido</button>
+      <button class="btn btn-primary" onclick="imprimirPedidoDelivery()">🖨️ Imprimir Pedido</button>
+    </div>
+  </div>
+
+  <!-- MODAL ALTERAR PEDIDO SELEÇÃO -->
+  <div class="modal-overlay" id="modal-alterar-pedido-selecao-overlay"></div>
+  <div class="modal" id="modal-alterar-pedido-selecao" style="width:500px">
+    <div class="modal-header">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin:0">O que você quer alterar?</h3>
+      <button class="btn btn-ghost" onclick="fecharModalAlterarPedidoSelecao()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body" style="padding-top:16px">
+      <div id="alterar-pedido-itens-list" style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;max-height:40vh;overflow-y:auto"></div>
+      
+      <button class="btn btn-ghost" style="width:100%;border:1px dashed var(--border-soft);color:var(--text)" onclick="adicionarNovoItemAoPedido()">
+        ＋ Adicionar Novo Item
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL AGRUPAR COMANDAS -->
+  <div class="modal-overlay" id="modal-agrupar-comandas-overlay"></div>
+  <div class="modal" id="modal-agrupar-comandas" style="width:400px">
+    <div class="modal-header">
+      <h3 style="font-family:'Playfair Display',serif;font-size:20px">Agrupar Comandas</h3>
+      <button class="btn btn-ghost" onclick="fecharModalAgruparComandas()" style="padding:8px">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px">Selecione outras comandas que deseja agrupar no pagamento.</p>
+      <div id="agrupar-comandas-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto"></div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn btn-ghost" onclick="pularAgrupamentoComandas()">Pular / Receber Única</button>
+      <button class="btn btn-primary" onclick="confirmarAgrupamentoComandas()">Agrupar e Receber</button>
+    </div>
+  </div>
+
+  <!-- MODAL RECEBIMENTO (PAGAMENTO PARCIAL/TOTAL) -->
+  <div class="modal-overlay" id="modal-recebimento-overlay"></div>
+  <div class="modal" id="modal-recebimento" style="width:800px;max-width:95vw;padding:0">
+    <div style="display:flex;height:600px;max-height:80vh">
+      <!-- Coluna Esquerda: Itens Selecionáveis -->
+      <div style="width:50%;border-right:1px solid var(--border-soft);display:flex;flex-direction:column">
+        <div style="padding:20px;border-bottom:1px solid var(--border-soft);background:var(--card-bg);border-radius:12px 0 0 0">
+          <h3 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:4px">Itens para Pagamento</h3>
+          <div style="font-size:12px;color:var(--text-dim)">Selecione os itens que deseja receber agora.</div>
+        </div>
+        <div style="padding:10px 20px;background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;font-weight:600">
+            <input type="checkbox" id="chk-recebimento-todos" onchange="toggleRecebimentoTodos(this)"> Selecionar Todos
+          </label>
+        </div>
+        <div id="recebimento-itens-list" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+      <!-- Coluna Direita: Pagamento -->
+      <div style="width:50%;display:flex;flex-direction:column;background:var(--content-bg);border-radius:0 12px 12px 0">
+        <div style="padding:20px;border-bottom:1px solid var(--border-soft)">
+          <div style="font-size:13px;color:var(--text-dim)">Total Selecionado</div>
+          <div id="recebimento-total-selecionado" style="font-size:32px;font-weight:700;color:var(--accent)">R$ 0,00</div>
+          
+          <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
+             <div style="font-size:12px;color:var(--text-dim)">Restante a Pagar da(s) Comanda(s):</div>
+             <div id="recebimento-total-restante" style="font-size:14px;font-weight:600;color:var(--danger)">R$ 0,00</div>
+          </div>
+        </div>
+        
+        <div style="flex:1;overflow-y:auto;padding:20px">
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Dividir Selecionado por N pessoas (opcional)</label>
+            <div style="display:flex;gap:8px">
+              <input type="number" id="recebimento-dividir" class="form-input" min="1" value="1" oninput="calcularRecebimento()" style="width:80px;text-align:center" />
+              <div id="recebimento-valor-dividido" style="flex:1;background:rgba(255,255,255,0.05);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--accent)">R$ 0,00 por pessoa</div>
+            </div>
+          </div>
+          
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text)">Valor a Receber Agora</div>
+          <input type="number" id="recebimento-valor-pagar" class="form-input" style="font-size:24px;font-weight:bold;height:60px;text-align:center;margin-bottom:20px" value="0.00" oninput="validarValorRecebimento()" />
+          
+          <div class="form-group" style="margin-bottom:20px">
+            <label class="form-label">Nome do Pagador (opcional)</label>
+            <input type="text" id="recebimento-nome-pagador" class="form-input" placeholder="Ex: João Silva" />
+          </div>
+
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text)">Forma de Pagamento</div>
+          <div id="recebimento-formas-pagamento" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+          
+          <div id="recebimento-troco-container" style="display:none;margin-top:20px;padding:16px;background:rgba(92,184,92,0.05);border:1px solid rgba(92,184,92,0.2);border-radius:8px">
+            <div class="form-group" style="margin-bottom:12px">
+              <label class="form-label">Valor Entregue pelo Cliente (R$)</label>
+              <input type="number" id="recebimento-valor-entregue" class="form-input" style="font-size:18px;font-weight:bold" placeholder="0.00" oninput="calcularTroco()" />
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+              <span style="font-size:13px;font-weight:600;color:var(--text-dim)">Troco a Devolver:</span>
+              <span id="recebimento-troco-valor" style="font-size:24px;font-weight:bold;color:var(--success)">R$ 0,00</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="padding:20px;border-top:1px solid var(--border-soft);display:flex;justify-content:space-between;gap:8px">
+          <button class="btn btn-ghost" onclick="fecharModalRecebimento()">Cancelar</button>
+          <div style="display:flex;gap:8px">
+            <button id="btn-salvar-pagamento" class="btn btn-ghost" style="border:1px solid var(--accent);color:var(--accent)" onclick="confirmarRecebimento(false)" disabled>Salvar Pagamento</button>
+            <button id="btn-confirmar-recebimento" class="btn btn-primary" style="background:var(--success);border-color:var(--success)" onclick="confirmarRecebimento(true)" disabled>Receber e Finalizar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARDÁPIO DIGITAL -->
+  <div class="page" id="page-vendas-cardapio-digital">
+    <div class="page-header" style="justify-content:space-between">
+      <div>
+        <div class="page-title">Cardápio Digital</div>
+        <div class="page-sub">Configurações do menu online para delivery e retirada</div>
+      </div>
+      <button class="btn btn-primary" onclick="salvarConfigCardapio()">Salvar Configurações</button>
+    </div>
+    
+    <div style="display:flex;gap:24px;align-items:flex-start">
+      <!-- Coluna Principal -->
+      <div style="flex:2;display:flex;flex-direction:column;gap:24px">
+        
+        <div class="card" style="padding:24px">
+          <h3 style="margin-top:0;margin-bottom:16px;font-size:16px;font-family:'Playfair Display',serif">Dados da Loja</h3>
+          <div class="form-group">
+            <label class="form-label">Nome da Loja</label>
+            <input type="text" id="f-cardapio-nome" class="form-input" placeholder="Ex: FoodFlow Burguer" />
+          </div>
+          <div class="form-group" style="margin-top:12px">
+            <label class="form-label">Endereço Completo</label>
+            <input type="text" id="f-cardapio-endereco" class="form-input" placeholder="Rua, Número, Bairro, Cidade - Estado" />
+          </div>
+          <div style="display:flex;gap:12px;margin-top:12px">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">Instagram</label>
+              <input type="text" id="f-cardapio-insta" class="form-input" placeholder="@seunegocio" />
+            </div>
+            <div class="form-group" style="flex:1">
+              <label class="form-label">WhatsApp (Pedidos)</label>
+              <input type="text" id="f-cardapio-wpp" class="form-input" placeholder="Ex: 5511999999999" />
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:24px">
+          <h3 style="margin-top:0;margin-bottom:16px;font-size:16px;font-family:'Playfair Display',serif">Operação e Entregas</h3>
+          <div style="display:flex;gap:12px;margin-bottom:12px">
+            <div class="form-group" style="flex:1">
+              <label class="form-label" style="font-weight:600">Horários de Atendimento</label>
+              <div id="f-cardapio-horarios-container" style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+                <!-- Horarios gerados por JS -->
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;margin-bottom:12px;margin-top:16px;border-top:1px dashed var(--border-soft);padding-top:16px">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">Opções de Serviço</label>
+              <div style="display:flex;gap:16px;margin-top:8px">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                  <input type="checkbox" id="f-cardapio-srv-entrega" checked> Aceita Entrega
+                </label>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                  <input type="checkbox" id="f-cardapio-srv-retirada" checked> Aceita Retirada
+                </label>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;margin-bottom:12px;margin-top:16px;border-top:1px dashed var(--border-soft);padding-top:16px">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">Pedido Mínimo (R$)</label>
+              <input type="number" id="f-cardapio-minimo" class="form-input" placeholder="0.00" step="0.01" />
+            </div>
+          </div>
+          <div style="display:flex;gap:12px;margin-bottom:16px">
+            <div class="form-group" style="flex:1">
+              <label class="form-label">Tempo Médio - Entrega</label>
+              <input type="text" id="f-cardapio-tempo-ent" class="form-input" placeholder="Ex: 45-60 min" />
+            </div>
+            <div class="form-group" style="flex:1">
+              <label class="form-label">Tempo Médio - Retirada</label>
+              <input type="text" id="f-cardapio-tempo-ret" class="form-input" placeholder="Ex: 20-30 min" />
+            </div>
+          </div>
+          
+          <div style="border-top:1px dashed var(--border-soft);padding-top:16px">
+            <label class="form-label" style="font-weight:600">Regras de Entrega</label>
+            <div style="display:flex;gap:16px;margin-bottom:12px">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                <input type="radio" name="cardapio-tipo-entrega" value="raio" checked onchange="toggleCardapioTipoEntrega()" /> Por Raio (KM)
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                <input type="radio" name="cardapio-tipo-entrega" value="bairro" onchange="toggleCardapioTipoEntrega()" /> Por Bairros
+              </label>
+            </div>
+            
+            <div id="cardapio-entrega-raio">
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px">Faixas de KM atendidas e suas respectivas taxas:</div>
+              <div id="cardapio-raios-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+              <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="adicionarRaioCardapio()">+ Adicionar Faixa de KM</button>
+            </div>
+            
+            <div id="cardapio-entrega-bairro" style="display:none">
+              <div style="font-size:12px;color:var(--text-dim);margin-bottom:8px">Bairros atendidos e suas respectivas taxas:</div>
+              <div id="cardapio-bairros-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px"></div>
+              <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="adicionarBairroCardapio()">+ Adicionar Bairro</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Coluna Lateral -->
+      <div style="flex:1;display:flex;flex-direction:column;gap:24px">
+        <div class="card" style="padding:24px">
+          <h3 style="margin-top:0;margin-bottom:16px;font-size:16px;font-family:'Playfair Display',serif">Aparência</h3>
+          <div class="form-group">
+            <label class="form-label">Logo da Loja</label>
+            <div style="width:80px;height:80px;border-radius:50%;background:var(--bg);border:1px dashed var(--border-soft);display:flex;align-items:center;justify-content:center;margin-bottom:8px;cursor:pointer;overflow:hidden">
+              <span style="font-size:24px;color:var(--text-dim)">📸</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-dim)">Clique para alterar a logo</div>
+          </div>
+          <div class="form-group" style="margin-top:16px">
+            <label class="form-label">Banner (Capa)</label>
+            <div style="width:100%;height:100px;border-radius:8px;background:var(--bg);border:1px dashed var(--border-soft);display:flex;align-items:center;justify-content:center;margin-bottom:8px;cursor:pointer">
+              <span style="font-size:24px;color:var(--text-dim)">🖼️</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-dim)">Clique para alterar o banner</div>
+          </div>
+        </div>
+        
+        <div class="card" style="padding:24px">
+          <h3 style="margin-top:0;margin-bottom:16px;font-size:16px;font-family:'Playfair Display',serif">Link do Cardápio</h3>
+          <div class="form-group">
+            <label class="form-label">Domínio Personalizado</label>
+            <input type="text" id="f-cardapio-dominio" class="form-input" placeholder="seunegocio.com.br" />
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Seu cardápio estará disponível em <b>foodflow.app/sua-loja</b> ou no domínio acima.</div>
+          </div>
+          <button class="btn btn-ghost" style="width:100%;margin-top:12px;border:1px solid var(--accent);color:var(--accent)">🔗 Copiar Link do Cardápio</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORMAS DE PAGAMENTO -->
+  <div class="page" id="page-vendas-pagamentos">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Formas de Pagamento</div>
+        <div class="page-sub">Gerencie as opções exibidas no caixa</div>
+      </div>
+      <button class="btn btn-primary" onclick="adicionarPagamento()">+ Novo Pagamento</button>
+    </div>
+    <div class="card" style="padding:24px;max-width:600px">
+      <div id="pagamentos-list" style="display:flex;flex-direction:column;gap:12px"></div>
+    </div>
+  </div>
+</main>
+<script src="script.js"></script>
+<div id="toast-container"></div>
+</body>
+</html>
