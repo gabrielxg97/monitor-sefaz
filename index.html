@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -371,21 +371,22 @@
   </div>
 
   <!-- DELIVERY ECOMMERCE -->
-<<<<<<< HEAD
   <!-- DELIVERY UNIFICADO -->
   <div class="page" id="page-vendas-delivery">
     <div class="page-header">
       <div>
         <div class="page-title">Delivery</div>
-        <div class="page-sub">Gestão de pedidos Ecommerce e Manual</div>
+        <div class="page-sub">Gestão única de pedidos Delivery, incluindo Ecommerce e Manual</div>
       </div>
       <button class="btn btn-primary" onclick="abrirModalNovoDeliveryManual()">＋ Novo Pedido</button>
     </div>
 
-    <!-- ABAS -->
-    <div style="padding:16px 24px;border-bottom:1px solid var(--border-soft);background:var(--card-bg);display:flex;gap:12px">
-      <button class="futuristic-tab active" data-delivery-tab="ecommerce" onclick="switchDeliveryTab('ecommerce', this)" style="padding:10px 20px">🌐 Ecommerce</button>
-      <button class="futuristic-tab" data-delivery-tab="manual" onclick="switchDeliveryTab('manual', this)" style="padding:10px 20px">📝 Manual</button>
+    <div style="padding:16px 24px;border-bottom:1px solid var(--border-soft);background:var(--card-bg);display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <div>
+        <div style="font-weight:600">Kanban único de pedidos</div>
+        <div style="font-size:13px;color:var(--text-dim);margin-top:4px">Pedidos Ecommerce e Manuais juntos em um fluxo único.</div>
+      </div>
+      <button class="btn btn-secondary" onclick="fecharDelivery()">🔒 Fechar Delivery</button>
     </div>
 
     <!-- KANBAN ECOMMERCE -->
@@ -434,33 +435,30 @@
       </div>
     </div>
 
-    <!-- KANBAN MANUAL -->
-    <div id="delivery-manual-pane" style="padding:24px;height:calc(100vh - 190px);overflow-x:auto;background:var(--bg);display:none;flex">
-      <div style="display:flex;gap:16px;height:100%;min-width:600px">
-        
-        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
-          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
-            EM PREPARO <span id="badge-kanban-manual-preparo" style="background:var(--accent);color:#000;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
-          </div>
-          <div id="col-kanban-manual-preparo" data-status="preparo" ondragover="allowDropManual(event)" ondrop="dropKanbanManual(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
-          </div>
-        </div>
+  </div>
 
-        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
-          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
-            PEDIDO PRONTO <span id="badge-kanban-manual-pronto" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
-          </div>
-          <div id="col-kanban-manual-pronto" data-status="pronto" ondragover="allowDropManual(event)" ondrop="dropKanbanManual(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
-          </div>
+  <div id="delivery-fechamento-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.8);z-index:51;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s">
+    <div class="card" style="width:420px;max-height:90vh;display:flex;flex-direction:column;transform:translateY(20px);transition:transform 0.3s">
+      <div style="padding:20px;border-bottom:1px solid var(--border-soft);display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0;font-family:'Playfair Display',serif">Fechamento de Delivery</h3>
+        <button onclick="cancelarFechamentoDelivery()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px">✕</button>
+      </div>
+      <div style="padding:20px;overflow-y:auto;flex:1">
+        <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.4">Preencha as formas de pagamento e marque se deseja acertar com os entregadores.</p>
+        <div id="delivery-fechamento-pagamentos-container" style="margin-bottom:20px"></div>
+        <div style="border-top:1px dashed var(--border-soft);padding-top:20px;margin-bottom:20px">
+          <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+            <span style="font-weight:600;font-size:14px">Acerto com entregadores?</span>
+            <label class="tog" style="margin:0">
+              <input type="checkbox" id="chk-delivery-entregadores" onchange="toggleDeliveryEntregadores()">
+              <span class="tog-track"></span>
+            </label>
+          </label>
+          <div id="delivery-fechamento-entregadores-container" style="display:none;margin-top:16px;background:var(--card-bg);padding:12px;border-radius:8px;border:1px solid var(--border-soft)"></div>
         </div>
-
-        <div style="flex:1;display:flex;flex-direction:column;background:var(--sidebar-bg);border-radius:12px;border:1px solid var(--border-soft)">
-          <div style="padding:16px;border-bottom:1px solid var(--border-soft);font-weight:600;display:flex;justify-content:space-between">
-            FINALIZADO <span id="badge-kanban-manual-finalizado" style="background:var(--success);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px">0</span>
-          </div>
-          <div id="col-kanban-manual-finalizado" data-status="finalizado" ondragover="allowDropManual(event)" ondrop="dropKanbanManual(event)" style="padding:12px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
-          </div>
-        </div>
+      </div>
+      <div style="padding:20px;border-top:1px solid var(--border-soft);background:rgba(0,0,0,0.02)">
+        <button class="btn btn-primary" style="width:100%" onclick="confirmarFechamentoDelivery()">Confirmar Fechamento</button>
       </div>
     </div>
   </div>
@@ -496,9 +494,6 @@
 
   <!-- DELIVERY ECOMMERCE (ANTIGO - MANTER COMPATIBILIDADE) -->
   <div class="page" id="page-vendas-delivery-ecommerce" style="display:none">
-=======
-  <div class="page" id="page-vendas-delivery-ecommerce">
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     <div class="page-header">
       <div>
         <div class="page-title">Pedidos Ecommerce</div>
@@ -552,13 +547,8 @@
     </div>
   </div>
 
-<<<<<<< HEAD
   <!-- DELIVERY MANUAL (ANTIGO - MANTER COMPATIBILIDADE) -->
   <div class="page" id="page-vendas-delivery-manual" style="display:none">
-=======
-  <!-- DELIVERY MANUAL -->
-  <div class="page" id="page-vendas-delivery-manual">
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     <div class="page-header">
       <div>
         <div class="page-title">Pedidos Delivery (Manual)</div>
@@ -618,11 +608,7 @@
       </div>
       <div class="form-group" style="margin-top:12px">
         <label class="form-label">Taxa de Entrega (R$)</label>
-<<<<<<< HEAD
         <input type="text" id="f-manual-taxa" class="form-input" placeholder="0,00" oninput="formatarValorMonetario(this)">
-=======
-        <input type="number" id="f-manual-taxa" class="form-input" placeholder="0.00" step="0.01">
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
       </div>
     </div>
     <div class="modal-footer" style="justify-content:flex-end">
@@ -867,11 +853,7 @@
         <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:14px;margin-bottom:14px">
           <div class="form-group" style="margin:0">
             <label class="form-label">Custo (R$)</label>
-<<<<<<< HEAD
             <input id="f-custo" class="form-input" type="text" placeholder="0,00" oninput="formatarValorMonetario(this); calcMarkup()" />
-=======
-            <input id="f-custo" class="form-input" type="number" step="0.01" placeholder="0,00" oninput="calcMarkup()" />
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
             <div style="font-size:10px;color:var(--text-dim);margin-top:4px" id="lbl-gera-ficha">Gera via Ficha Técnica</div>
           </div>
           <div class="form-group" id="wrapper-markup" style="margin:0">
@@ -880,11 +862,7 @@
           </div>
           <div class="form-group" id="wrapper-venda" style="margin:0">
             <label class="form-label">Venda Salão (R$)</label>
-<<<<<<< HEAD
             <input id="f-venda" class="form-input" type="text" placeholder="0,00" oninput="formatarValorMonetario(this)" />
-=======
-            <input id="f-venda" class="form-input" type="number" step="0.01" placeholder="0,00" />
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
           </div>
         </div>
 
@@ -1016,11 +994,7 @@
         <div style="display:grid;grid-template-columns:1fr 2fr;gap:14px">
           <div class="form-group">
             <label class="form-label">Preço Delivery (R$)</label>
-<<<<<<< HEAD
             <input id="f-venda-delivery" class="form-input" type="text" placeholder="Igual Salão" oninput="formatarValorMonetario(this)" />
-=======
-            <input id="f-venda-delivery" class="form-input" type="number" step="0.01" placeholder="Igual Salão" />
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
           </div>
           <div>
             <div style="font-size:11px;color:var(--text-dim);margin-top:24px">Se vazio, usará o valor cadastrado na aba Geral.</div>
@@ -1298,18 +1272,106 @@
       <button class="btn btn-primary">＋ Adicionar Mesa</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px">
-      ${[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20].map(n => {
-        const states = ['occupied','occupied','free','occupied','free','occupied','free','free','occupied','occupied','occupied','free','occupied','occupied','free','free','occupied','free','occupied','free'];
-        const s = states[n-1];
-        const bg = s === 'occupied' ? 'rgba(232,160,32,0.12)' : 'rgba(92,184,92,0.08)';
-        const bc = s === 'occupied' ? 'rgba(232,160,32,0.3)' : 'rgba(92,184,92,0.3)';
-        const ic = s === 'occupied' ? '🔴' : '🟢';
-        return `<div style="background:${bg};border:1px solid ${bc};border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-          <div style="font-size:20px;margin-bottom:4px">${ic}</div>
-          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M${n}</div>
-          <div style="font-size:10px;color:var(--text-dim);margin-top:2px">${s === 'occupied' ? '4 pessoas' : 'Livre'}</div>
-        </div>`;
-      }).join('')}
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M1</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M2</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M3</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M4</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M5</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M6</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M7</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M8</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M9</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M10</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M11</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M12</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M13</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M14</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M15</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M16</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M17</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M18</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
+      <div style="background:rgba(92,184,92,0.08);border:1px solid rgba(92,184,92,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">?</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M19</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Livre</div>
+      </div>
+      <div style="background:rgba(232,160,32,0.12);border:1px solid rgba(232,160,32,0.3);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:transform 0.15s">
+        <div style="font-size:20px;margin-bottom:4px">??</div>
+        <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text)">M20</div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:2px">4 pessoas</div>
+      </div>
     </div>
   </div>
 
@@ -1374,16 +1436,41 @@
       <div class="card-header"><span class="card-title">Vendas por Dia — Últimos 7 dias</span></div>
       <div style="padding:24px">
         <div style="display:flex;align-items:flex-end;gap:12px;height:120px">
-          ${[3200,4100,3800,4500,3900,4820,0].map((v,i) => {
-            const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
-            const h = v ? Math.round((v/4820)*100) : 4;
-            const active = i === 5;
-            return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
-              <div style="font-size:10px;color:var(--text-dim)">R$${v ? (v/1000).toFixed(1)+'k' : '--'}</div>
-              <div style="width:100%;height:${h}%;background:${active ? 'var(--accent)' : 'rgba(232,160,32,0.2)'};border-radius:6px 6px 0 0;transition:height 0.3s"></div>
-              <div style="font-size:10px;color:${active?'var(--accent)':'var(--text-dim)'}">${days[i]}</div>
-            </div>`;
-          }).join('')}
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="font-size:10px;color:var(--text-dim)">R$3.2k</div>
+            <div style="width:100%;height:66%;background:rgba(232,160,32,0.2);border-radius:6px 6px 0 0;transition:height 0.3s"></div>
+            <div style="font-size:10px;color:var(--text-dim)">Seg</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="font-size:10px;color:var(--text-dim)">R$4.1k</div>
+            <div style="width:100%;height:85%;background:rgba(232,160,32,0.2);border-radius:6px 6px 0 0;transition:height 0.3s"></div>
+            <div style="font-size:10px;color:var(--text-dim)">Ter</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="font-size:10px;color:var(--text-dim)">R$3.8k</div>
+            <div style="width:100%;height:79%;background:rgba(232,160,32,0.2);border-radius:6px 6px 0 0;transition:height 0.3s"></div>
+            <div style="font-size:10px;color:var(--text-dim)">Qua</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="font-size:10px;color:var(--text-dim)">R$4.5k</div>
+            <div style="width:100%;height:93%;background:rgba(232,160,32,0.2);border-radius:6px 6px 0 0;transition:height 0.3s"></div>
+            <div style="font-size:10px;color:var(--text-dim)">Qui</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="font-size:10px;color:var(--text-dim)">R$3.9k</div>
+            <div style="width:100%;height:81%;background:rgba(232,160,32,0.2);border-radius:6px 6px 0 0;transition:height 0.3s"></div>
+            <div style="font-size:10px;color:var(--text-dim)">Sex</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="font-size:10px;color:var(--accent)">R$4.8k</div>
+            <div style="width:100%;height:100%;background:var(--accent);border-radius:6px 6px 0 0;transition:height 0.3s"></div>
+            <div style="font-size:10px;color:var(--accent)">S�b</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+            <div style="font-size:10px;color:var(--text-dim)">--</div>
+            <div style="width:100%;height:4%;background:rgba(232,160,32,0.2);border-radius:6px 6px 0 0;transition:height 0.3s"></div>
+            <div style="font-size:10px;color:var(--text-dim)">Dom</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1459,7 +1546,6 @@
         </div>
       </div>
 
-<<<<<<< HEAD
       <div style="width:250px;display:flex;justify-content:flex-end;gap:12px">
         <div style="position:relative">
           <button class="btn btn-ghost" id="btn-acoes-caixa" onclick="toggleMenuAcoesCaixa()" style="display:none">⚙️ Ações do Caixa</button>
@@ -1469,10 +1555,6 @@
             <button style="width:100%;padding:12px 16px;border:none;background:none;color:var(--danger);text-align:left;cursor:pointer;font-size:13px;transition:background 0.2s" onmouseover="this.style.background='rgba(224,92,74,0.1)'" onmouseout="this.style.background='none'" onclick="fecharCaixa()">🔒 Fechar Caixa</button>
           </div>
         </div>
-=======
-      <div style="width:250px;display:flex;justify-content:flex-end">
-        <button class="btn btn-ghost" id="btn-fechar-caixa" onclick="fecharCaixa()" style="display:none;border-color:var(--danger);color:var(--danger)">🔒 Fechar Caixa</button>
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
       </div>
     </div>
 
@@ -1486,11 +1568,7 @@
         <div class="card" style="padding:24px;width:300px">
           <div class="form-group">
             <label class="form-label">Fundo de Troco Inicial (R$)</label>
-<<<<<<< HEAD
             <input type="text" id="f-fundo-troco" class="form-input" placeholder="0,00" value="0,00" data-inicial="true" oninput="formatarValorMonetario(this)" />
-=======
-            <input type="number" id="f-fundo-troco" class="form-input" placeholder="0.00" value="0.00" step="0.01" />
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
           </div>
           <button class="btn btn-primary" style="width:100%" onclick="abrirCaixa()">Abrir Caixa</button>
         </div>
@@ -1506,19 +1584,6 @@
           <div style="padding:20px;overflow-y:auto;flex:1">
             <p style="font-size:13px;color:var(--text-dim);margin-bottom:20px;line-height:1.4">Informe os valores contados na gaveta e nas maquininhas para registrar o fechamento. Deixe em branco se for zero.</p>
             <div id="fechamento-pagamentos-container" style="margin-bottom:20px"></div>
-            
-            <div style="border-top:1px dashed var(--border-soft);padding-top:20px;margin-bottom:20px">
-              <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
-                <span style="font-weight:600;font-size:14px">Acerto com Entregadores?</span>
-                <label class="tog" style="margin:0">
-                  <input type="checkbox" id="chk-fechamento-entregadores" onchange="toggleFechamentoEntregadores()">
-                  <span class="tog-track"></span>
-                </label>
-              </label>
-              <div id="fechamento-entregadores-container" style="display:none;margin-top:16px;background:var(--card-bg);padding:12px;border-radius:8px;border:1px solid var(--border-soft)">
-              </div>
-            </div>
-            
             <button class="btn btn-ghost" style="width:100%;border:1px solid var(--border-soft);margin-bottom:8px" onclick="imprimirRelatorioEntregadores()">🖨️ Relatório de Entregas</button>
           </div>
           <div style="padding:20px;border-top:1px solid var(--border-soft);background:rgba(0,0,0,0.2)">
@@ -1527,7 +1592,6 @@
         </div>
       </div>
 
-<<<<<<< HEAD
       <!-- OVERLAY SANGRIA DE CAIXA -->
       <div id="sangria-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.8);z-index:51;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s">
         <div id="sangria-modal" class="card" style="width:400px;padding:0;transform:translateY(20px);transition:transform 0.3s">
@@ -1604,8 +1668,6 @@
         </div>
       </div>
 
-=======
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
       <!-- VENDA DIRETA -->
       <div class="caixa-pane active" id="pane-venda-direta" style="display:flex;height:100%">
         <!-- LISTA PRODUTOS E NAVEGAÇÃO -->
@@ -2100,3 +2162,4 @@
 <div id="toast-container"></div>
 </body>
 </html>
+

@@ -1,4 +1,4 @@
-const menus = {
+﻿const menus = {
   produtos: {
     title: 'Produtos',
     subtitle: 'Gestão de produtos',
@@ -19,13 +19,7 @@ const menus = {
     sections: [
       { label:'Operação', items: [
         { icon:'💻', name:'Caixa (PDV)', desc:'Frente de caixa', page:'vendas-caixa' },
-<<<<<<< HEAD
         { icon:'🌐', name:'Delivery', desc:'Ecommerce e Manual', page:'vendas-delivery' }
-=======
-        { type:'divider', name: 'DELIVERY' },
-        { icon:'🌐', name:'Pedidos Ecommerce', desc:'Cardápio/Ifood', page:'vendas-delivery-ecommerce', indent: true },
-        { icon:'📝', name:'Pedidos Delivery', desc:'Lançamento Manual', page:'vendas-delivery-manual', indent: true }
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
       ]},
       { label:'Configurações', items: [
         { icon:'📱', name:'Cardápio Digital', desc:'Menu Online', page:'vendas-cardapio-digital' },
@@ -166,40 +160,111 @@ if (!cardapioConfig.diasHorarios || typeof cardapioConfig.horarios === 'string')
 }
 
 let mockDelivery = JSON.parse(localStorage.getItem('mockDelivery')) || [];
+const defaultMockDelivery = [
+  {
+    id: 1001,
+    tipo: 'Entrega',
+    status: 'novo',
+    hora: new Date().toISOString(),
+    cliente: 'João Silva',
+    telefone: '11988887777',
+    endereco: 'Rua das Primaveras, 45 - Apto 21',
+    itens: [{ nome: 'X-Burger', qtd: 2, preco: 25.00 }],
+    subtotal: 50.00,
+    taxa: 5.00,
+    total: 55.00,
+    pagamento: 'Pix',
+    entregadorId: null,
+    channel: 'iFood'
+  },
+  {
+    id: 1002,
+    tipo: 'Entrega',
+    status: 'preparo',
+    hora: new Date(Date.now() - 15*60000).toISOString(),
+    cliente: 'Maria Oliveira',
+    telefone: '11977776666',
+    endereco: 'Av. Brasil, 1500 - Casa',
+    itens: [{ nome: 'Pizza Calabresa', qtd: 1, preco: 45.00 }, { nome: 'Coca-Cola 2L', qtd: 1, preco: 12.00 }],
+    subtotal: 57.00,
+    taxa: 8.00,
+    total: 65.00,
+    pagamento: 'Dinheiro',
+    entregadorId: null,
+    channel: 'Cardápio Digital'
+  },
+  {
+    id: 1003,
+    tipo: 'Entrega',
+    status: 'saiu_entrega',
+    hora: new Date(Date.now() - 40*60000).toISOString(),
+    cliente: 'Fernanda Souza',
+    telefone: '11955554444',
+    endereco: 'Alameda Santos, 123',
+    itens: [{ nome: 'Combo Família', qtd: 1, preco: 89.90 }],
+    subtotal: 89.90,
+    taxa: 10.00,
+    total: 99.90,
+    pagamento: 'Cartão',
+    entregadorId: 2,
+    channel: 'iFood'
+  },
+  {
+    id: 1004,
+    tipo: 'Entrega',
+    status: 'pronto',
+    hora: new Date(Date.now() - 55*60000).toISOString(),
+    cliente: 'Carlos Nogueira',
+    telefone: '11966665555',
+    endereco: 'Rua do Comércio, 320',
+    itens: [{ nome: 'Lasanha Bolonhesa', qtd: 1, preco: 42.00 }],
+    subtotal: 42.00,
+    taxa: 5.00,
+    total: 47.00,
+    pagamento: 'Cartão',
+    entregadorId: 1,
+    channel: 'Cardápio Digital'
+  },
+  {
+    id: 1005,
+    tipo: 'Entrega',
+    status: 'novo',
+    hora: new Date(Date.now() - 5*60000).toISOString(),
+    cliente: 'Luciana Mendes',
+    telefone: '11944443333',
+    endereco: 'Rua das Acácias, 78',
+    itens: [{ nome: 'Sushi Box', qtd: 1, preco: 72.00 }],
+    subtotal: 72.00,
+    taxa: 8.00,
+    total: 80.00,
+    pagamento: 'Pix',
+    entregadorId: null,
+    channel: 'Manual'
+  }
+];
 if (mockDelivery.length === 0) {
-  mockDelivery = [
-    {
-      id: 1001,
-      tipo: 'Entrega',
-      status: 'novo',
-      hora: new Date().toISOString(),
-      cliente: 'João Silva',
-      telefone: '11988887777',
-      endereco: 'Rua das Primaveras, 45 - Apto 21',
-      itens: [{ nome: 'X-Burger', qtd: 2, preco: 25.00 }],
-      subtotal: 50.00,
-      taxa: 5.00,
-      total: 55.00,
-      pagamento: 'Pix',
-      entregadorId: null
-    },
-    {
-      id: 1002,
-      tipo: 'Entrega',
-      status: 'preparo',
-      hora: new Date(Date.now() - 15*60000).toISOString(),
-      cliente: 'Maria Oliveira',
-      telefone: '11977776666',
-      endereco: 'Av. Brasil, 1500 - Casa',
-      itens: [{ nome: 'Pizza Calabresa', qtd: 1, preco: 45.00 }, { nome: 'Coca-Cola 2L', qtd: 1, preco: 12.00 }],
-      subtotal: 57.00,
-      taxa: 8.00,
-      total: 65.00,
-      pagamento: 'Dinheiro',
-      entregadorId: null
-    }
-  ];
+  mockDelivery = defaultMockDelivery;
   localStorage.setItem('mockDelivery', JSON.stringify(mockDelivery));
+} else {
+  let updated = false;
+  mockDelivery = mockDelivery.map(d => {
+    if (!d.channel) {
+      updated = true;
+      return { ...d, channel: d.tipo === 'Entrega' ? 'Cardápio Digital' : 'Delivery' };
+    }
+    return d;
+  });
+  if (mockDelivery.length < defaultMockDelivery.length) {
+    defaultMockDelivery.forEach(item => {
+      if (!mockDelivery.find(x => x.id === item.id)) {
+        mockDelivery.push(item);
+        updated = true;
+      }
+    });
+  }
+  if (updated) {
+    localStorage.setItem('mockDelivery', JSON.stringify(mockDelivery));
+  }
 }
 
 // Navegação Drill-Down
@@ -291,11 +356,6 @@ function navigateTo(pageKey) {
     if(typeof renderCardapioConfig === 'function') renderCardapioConfig();
   } else if (pageKey === 'vendas-caixa') {
     if(typeof openCaixa === 'function') openCaixa();
-<<<<<<< HEAD
-  } else if (pageKey === 'vendas-delivery') {
-    if(typeof openDeliveryPage === 'function') openDeliveryPage();
-=======
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
   }
 
   // Apenas atualiza a classe active sem reconstruir o DOM (evita a "piscada")
@@ -1377,13 +1437,8 @@ function saveProduct() {
     categoria: document.getElementById('f-categoria').value || 'Sem Categoria',
     subcategoria: document.getElementById('f-subcategoria') ? document.getElementById('f-subcategoria').value : '',
     tipo: document.getElementById('f-tipo') ? document.getElementById('f-tipo').value : '',
-<<<<<<< HEAD
     venda: parseFloat(document.getElementById('f-venda').value.replace(',', '.')) || 0,
     custo: parseFloat(document.getElementById('f-custo').value.replace(',', '.')) || 0,
-=======
-    venda: parseFloat(document.getElementById('f-venda').value) || 0,
-    custo: parseFloat(document.getElementById('f-custo').value) || 0,
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     estoque: estqVal ? parseInt(estqVal) : '-',
     ativo: document.getElementById('f-ativo').checked,
     delivery: document.getElementById('f-delivery') ? document.getElementById('f-delivery').checked : true,
@@ -1462,24 +1517,15 @@ function calcMarkup() {
   const markupStr = document.getElementById('f-markup').value;
   
   if(custoStr && markupStr) {
-<<<<<<< HEAD
     const custo = parseFloat(custoStr.replace(',', '.'));
     const markup = parseFloat(markupStr);
     if(!isNaN(custo) && !isNaN(markup)) {
       const venda = custo * (1 + (markup / 100));
       document.getElementById('f-venda').value = venda.toFixed(2).replace('.', ',');
-=======
-    const custo = parseFloat(custoStr);
-    const markup = parseFloat(markupStr);
-    if(!isNaN(custo) && !isNaN(markup)) {
-      const venda = custo * (1 + (markup / 100));
-      document.getElementById('f-venda').value = venda.toFixed(2);
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     }
   }
 }
 
-<<<<<<< HEAD
 function formatarValorMonetario(el) {
   // Se é o primeiro dígito sendo digitado em um campo com valor inicial "0,00" ou similar
   if(el.dataset.inicial === 'true' && el.value.match(/^0,0+$/)) {
@@ -1504,8 +1550,6 @@ function formatarValorMonetario(el) {
   }
 }
 
-=======
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
 function updateToggleStyle(el, trackId) {
   // handled by pure css .tog input:checked + .tog-track
 }
@@ -1619,32 +1663,18 @@ function renderConfigMesas() {
 
 function openCaixa() {
   const overlay = document.getElementById('caixa-overlay');
-<<<<<<< HEAD
   const acoesBtnDiv = document.getElementById('btn-acoes-caixa');
   const label = document.getElementById('caixa-status-label');
-  
-  // Fechar menu de ações
   const menuAcoes = document.getElementById('menu-acoes-caixa');
   if(menuAcoes) menuAcoes.style.display = 'none';
   
   if(caixaStatus === 'fechado') {
     overlay.style.display = 'flex';
-    acoesBtnDiv.style.display = 'none';
+    if(acoesBtnDiv) acoesBtnDiv.style.display = 'none';
     label.textContent = 'Status: Fechado';
   } else {
     overlay.style.display = 'none';
-    acoesBtnDiv.style.display = 'flex';
-=======
-  const fecharBtn = document.getElementById('btn-fechar-caixa');
-  const label = document.getElementById('caixa-status-label');
-  
-  if(caixaStatus === 'fechado') {
-    overlay.style.display = 'flex';
-    fecharBtn.style.display = 'none';
-    label.textContent = 'Status: Fechado';
-  } else {
-    overlay.style.display = 'none';
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
+    if(acoesBtnDiv) acoesBtnDiv.style.display = 'flex';
     const openedAt = localStorage.getItem('caixaAbertoEm');
     let timeStr = '';
     if(openedAt) {
@@ -1662,11 +1692,7 @@ function openCaixa() {
 }
 
 function abrirCaixa() {
-<<<<<<< HEAD
   const val = parseFloat(document.getElementById('f-fundo-troco').value.replace(',', '.')) || 0;
-=======
-  const val = parseFloat(document.getElementById('f-fundo-troco').value) || 0;
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
   caixaSaldoInicial = val;
   caixaStatus = 'aberto';
   localStorage.setItem('caixaStatus', 'aberto');
@@ -1689,14 +1715,10 @@ function fecharCaixa() {
   container.innerHTML = mockPagamentos.filter(p => p.ativo).map(p => `
     <div style="display:flex;justify-content:space-between;margin-bottom:12px;align-items:center">
       <div style="font-size:14px;font-weight:600">${p.nome}</div>
-<<<<<<< HEAD
       <input type="text" step="0.01" class="form-input" style="width:120px;text-align:right" placeholder="0,00" id="fechar-val-${p.id}" data-inicial="true" oninput="formatarValorMonetario(this)" />
-=======
-      <input type="number" step="0.01" class="form-input" style="width:120px;text-align:right" placeholder="0.00" id="fechar-val-${p.id}" />
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     </div>
   `).join('');
-  
+
   const chk = document.getElementById('chk-fechamento-entregadores');
   if(chk) chk.checked = false;
   const contEnt = document.getElementById('fechamento-entregadores-container');
@@ -1772,7 +1794,84 @@ function confirmarFechamentoCaixa() {
   openCaixa();
 }
 
-<<<<<<< HEAD
+function fecharDelivery() {
+  const overlay = document.getElementById('delivery-fechamento-overlay');
+  const container = document.getElementById('delivery-fechamento-pagamentos-container');
+  if (container) {
+    container.innerHTML = mockPagamentos.filter(p => p.ativo).map(p => `
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;align-items:center">
+        <div style="font-size:14px;font-weight:600">${p.nome}</div>
+        <input type="text" step="0.01" class="form-input" style="width:120px;text-align:right" placeholder="0,00" id="delivery-fechar-val-${p.id}" data-inicial="true" oninput="formatarValorMonetario(this)" />
+      </div>
+    `).join('');
+  }
+
+  const chk = document.getElementById('chk-delivery-entregadores');
+  if (chk) chk.checked = false;
+  const contEnt = document.getElementById('delivery-fechamento-entregadores-container');
+  if (contEnt) {
+    contEnt.style.display = 'none';
+    contEnt.innerHTML = '';
+  }
+
+  if (overlay) {
+    overlay.style.opacity = '1';
+    overlay.style.pointerEvents = 'auto';
+  }
+}
+
+function cancelarFechamentoDelivery() {
+  const overlay = document.getElementById('delivery-fechamento-overlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    overlay.style.pointerEvents = 'none';
+  }
+}
+
+function confirmarFechamentoDelivery() {
+  showToast('Delivery fechado com sucesso!', 'success');
+  cancelarFechamentoDelivery();
+}
+
+function toggleDeliveryEntregadores() {
+  const isChecked = document.getElementById('chk-delivery-entregadores').checked;
+  const container = document.getElementById('delivery-fechamento-entregadores-container');
+  if (!container) return;
+  if (!isChecked) {
+    container.style.display = 'none';
+    return;
+  }
+
+  const hoje = new Date().toISOString().split('T')[0];
+  const entregasHoje = mockDelivery.filter(d => d.status === 'finalizado' && d.hora.startsWith(hoje) && d.entregadorId);
+  if (entregasHoje.length === 0) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-dim);text-align:center">Nenhuma entrega registrada hoje com entregador.</div>';
+    container.style.display = 'block';
+    return;
+  }
+
+  const valoresPorEntregador = {};
+  entregasHoje.forEach(d => {
+    if (!valoresPorEntregador[d.entregadorId]) {
+      valoresPorEntregador[d.entregadorId] = 0;
+    }
+    valoresPorEntregador[d.entregadorId] += d.taxa;
+  });
+
+  let html = '<div style="font-size:12px;color:var(--text-dim);margin-bottom:8px">Valores acumulados de taxa de entrega:</div>';
+  for (let eId in valoresPorEntregador) {
+    const e = mockEntregadores.find(x => x.id == eId);
+    html += `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="font-weight:600;font-size:13px">${e ? e.nome : 'Entregador #' + eId}</div>
+        <div style="color:var(--accent);font-weight:bold">R$ ${valoresPorEntregador[eId].toFixed(2)}</div>
+      </div>
+    `;
+  }
+  container.innerHTML = html;
+  container.style.display = 'block';
+}
+
 function toggleMenuAcoesCaixa() {
   const menu = document.getElementById('menu-acoes-caixa');
   if(menu) {
@@ -1876,8 +1975,6 @@ function confirmarSuprimento() {
   cancelarSuprimento();
 }
 
-=======
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
 function switchCaixaTab(tabId, el) {
   if (tabId === 'balcao') {
     // Restaurar a aba visual anterior para não ficar com "Balcão" acesa antes de confirmar
@@ -2247,6 +2344,7 @@ function renderPDVDelivery() {
             <span style="font-size:11px;color:var(--text-dim)">${new Date(d.hora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
           </div>
           <div style="font-size:13px;margin-bottom:4px;font-weight:600">${d.cliente}</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px">${d.channel || 'Delivery'}</div>
           ${d.tipo === 'Entrega' || d.tipo === 'Viagem' ? `<div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">${d.endereco || 'Retirada'}</div>` : ''}
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:10px;background:rgba(255,255,255,0.1);padding:2px 6px;border-radius:4px">${d.tipo}</span>
@@ -2301,7 +2399,6 @@ function dropKanban(ev) {
   }
 }
 
-<<<<<<< HEAD
 // --- DELIVERY UNIFIED TAB SWITCH ---
 function switchDeliveryTab(tabId, el) {
   // Remove active de todas as abas
@@ -2323,8 +2420,6 @@ function switchDeliveryTab(tabId, el) {
   }
 }
 
-=======
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
 // --- MANUAL DELIVERY KANBAN LOGIC ---
 function renderManualDelivery() {
   const statuses = ['preparo', 'pronto', 'finalizado'];
@@ -2422,11 +2517,7 @@ function iniciarPedidoManual() {
   }
   const tel = document.getElementById('f-manual-telefone').value.trim();
   const end = document.getElementById('f-manual-endereco').value.trim();
-<<<<<<< HEAD
   const taxa = parseFloat(document.getElementById('f-manual-taxa').value.replace(',', '.')) || 0;
-=======
-  const taxa = parseFloat(document.getElementById('f-manual-taxa').value) || 0;
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
   
   window.pdvActiveDeliveryManualContext = {
     nome,
@@ -3185,12 +3276,8 @@ function finalizarVendaDireta() {
     if (titleEl) titleEl.textContent = 'Nova Venda Direta';
     
     showToast('Pedido manual criado com sucesso!', 'success');
-<<<<<<< HEAD
     window.pdvDeliveryDefaultTab = 'manual';
     navigateTo('vendas-delivery');
-=======
-    navigateTo('vendas-delivery-manual');
->>>>>>> 7d6b495e688456aeff515e1e6755c6d711f98b1d
     return;
   }
 
