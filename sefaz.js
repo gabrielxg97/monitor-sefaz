@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tabs.forEach(t => t.classList.remove('active'));
             e.target.classList.add('active');
             currentModel = e.target.getAttribute('data-model');
-            document.getElementById('api-url').textContent = `https://integranotas.com.br/doc/sefaz/monitor/${currentModel}`;
+            document.getElementById('api-url').textContent = `${API_BASE}/${currentModel}`;
             loadDashboard(currentModel);
         });
     });
@@ -62,57 +62,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 60000);
 });
 
-function rgb2hex(rgb) {
-    const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-    if (!match) return rgb;
-    function hex(x) {
-        return ('0' + parseInt(x).toString(16)).slice(-2);
-    }
-    return '#' + hex(match[1]) + hex(match[2]) + hex(match[3]);
-}
+const API_BASE = 'https://integranotas.com.br/api/sefaz';
 
-function getStatusName(color) {
-    const match = color.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-    if (!match) return 'Desconhecido';
-    const r = parseInt(match[1]), g = parseInt(match[2]), b = parseInt(match[3]);
-    
-    // Blue = Contingência (high blue, low red)
-    if (b > 180 && r < 100) return 'Contingência';
-    // Green = Normal (high green, low red)
-    if (g > 150 && r < 100) return 'Normal';
-    // Yellow = Instável (high red + green, low blue)
-    if (r > 200 && g > 150 && b < 80) return 'Instável';
-    // Orange = Lentidão (high red, medium green)
-    if (r > 200 && g > 80 && g < 160 && b < 80) return 'Lentidão';
-    // Red = Parada (high red, low green)
-    if (r > 180 && g < 100) return 'Parada';
-    
-    return 'Desconhecido';
+const STATUS = {
+    normal:       { nome: 'Normal',       cor: '#10b981' },
+    instavel:     { nome: 'Instável',     cor: '#eab308' },
+    lenta:        { nome: 'Lentidão',     cor: '#f97316' },
+    parada:       { nome: 'Parada',       cor: '#ef4444' },
+    contingencia: { nome: 'Contingência', cor: '#3b82f6' },
+};
+
+// Normaliza o texto de "situacao" vindo da API (ex.: "instável", "lentidao", "SVC")
+function normalizarSituacao(sit) {
+    const s = String(sit || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (s.startsWith('normal')) return 'normal';
+    if (s.startsWith('instav')) return 'instavel';
+    if (s.startsWith('lent')) return 'lenta';
+    if (s.startsWith('parad') || s.startsWith('fora') || s.startsWith('offline')) return 'parada';
+    if (s.startsWith('conting') || s === 'svc') return 'contingencia';
+    return null;
 }
 
 function loadDashboard(model, isRefresh = false) {
     const loading = document.getElementById('loading');
     loading.classList.add('active');
 
-    const apiUrl = `https://integranotas.com.br/doc/sefaz/monitor/${model}`;
-    const headers = {
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-    };
-    
-    // Validate response has the expected structure
+    const apiUrl = `${API_BASE}/${model}`;
+
     function validate(data) {
-        if (data && data.dados && data.dados.labels && data.dados.labels.length > 0) return data;
-        throw new Error('Invalid data structure');
+        if (data && Array.isArray(data.estados) && data.estados.length > 0) return data;
+        throw new Error('Estrutura de dados inválida');
+    }
+    function getJson(url) {
+        return fetch(url, { cache: 'no-store' }).then(r => {
+            if (!r.ok) throw new Error(`HTTP ${r.status} em ${url}`);
+            return r.json();
+        }).then(validate);
     }
 
     const strategies = [
-        // Strategy 1: Direct fetch with required headers
-        () => fetch(apiUrl, { headers }).then(r => { if (!r.ok) throw new Error('Direct failed'); return r.json(); }).then(validate),
-        // Strategy 2: CORS proxy via corsproxy.io
-        () => fetch(`https://corsproxy.io/?${encodeURIComponent(apiUrl)}`, { headers }).then(r => { if (!r.ok) throw new Error('Proxy 1 failed'); return r.json(); }).then(validate),
-        // Strategy 3: CORS proxy via allorigins (wraps response)
-        () => fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl)}`).then(r => { if (!r.ok) throw new Error('Proxy 2 failed'); return r.json(); }).then(d => JSON.parse(d.contents)).then(validate),
+        // 1) JSON gerado pelo GitHub Actions no próprio site (mesma origem, sem CORS)
+        () => getJson(`data/${model}.json?t=${Date.now()}`),
+        // 2) Chamada direta (funciona se a IntegraNotas liberar CORS no futuro)
+        () => getJson(apiUrl),
     ];
 
     tryStrategies(strategies, 0)
@@ -121,9 +113,9 @@ function loadDashboard(model, isRefresh = false) {
             if (isRefresh) showToast('✅ Dados atualizados com sucesso!');
         })
         .catch(err => {
-            console.warn('Todas as estratégias falharam, usando dados simulados:', err);
+            console.warn('Não foi possível obter dados reais, usando simulados:', err);
             updateUI(generateDummyData());
-            showToast('⚠️ Usando dados simulados (CORS bloqueado)');
+            showToast('⚠️ Usando dados simulados (API indisponível)');
         })
         .finally(() => {
             loading.classList.remove('active');
@@ -131,72 +123,59 @@ function loadDashboard(model, isRefresh = false) {
 }
 
 function tryStrategies(strategies, index) {
-    if (index >= strategies.length) return Promise.reject(new Error('All strategies failed'));
-    return strategies[index]().catch(() => tryStrategies(strategies, index + 1));
+    if (index >= strategies.length) return Promise.reject(new Error('Todas as estratégias falharam'));
+    return strategies[index]().catch(err => {
+        console.warn(err.message);
+        return tryStrategies(strategies, index + 1);
+    });
 }
 
 function updateUI(data) {
     let countNormal = 0;
     let countIssues = 0;
     let countContingencia = 0;
-    
+
     const tbody = document.getElementById('state-table-body');
     tbody.innerHTML = '';
-    
-    const now = new Date().toLocaleTimeString('pt-BR');
 
-    for (let i = 0; i < 27; i++) {
-        const ms = data.dados.data[i];
-        const uf = data.dados.labels[i];
-        const bg = data.dados.backgroundColor[i];
-        const normal = data.dados.normal[i];
-        const svc = data.dados.svc[i];
-        
-        let color = bg;
-        if (normal == 0 && svc == 1) {
-            color = 'rgb(47, 85, 212)'; // Blue for contingency
-        }
+    const horario = data.consultado_em ? new Date(data.consultado_em) : new Date();
+    const now = horario.toLocaleTimeString('pt-BR');
 
-        // Stats calculation
-        if (normal == 1) countNormal++;
-        else if (svc == 1) countContingencia++;
+    const estados = [...data.estados].sort((a, b) => a.uf.localeCompare(b.uf));
+
+    estados.forEach(est => {
+        const uf = est.uf;
+        const ms = est.tempo_medio ?? '-';
+        const svc = !!est.svc_disponivel;
+        let key = normalizarSituacao(est.situacao) || 'parada';
+        const st = STATUS[key];
+
+        if (key === 'normal') countNormal++;
+        else if (key === 'contingencia') countContingencia++;
         else countIssues++;
 
-        // Update SVG
+        // Mapa
         const stateEl = document.querySelector(`a[uf='${uf}']`);
         if (stateEl) {
             stateEl.setAttribute('data-ms', ms);
-            stateEl.setAttribute('data-svc', svc == 1 ? 'Sim' : 'Não');
-            
-            // Add pulse if issue
-            if (normal == 0 && svc == 0) {
-                stateEl.classList.add('pulse');
-            } else {
-                stateEl.classList.remove('pulse');
-            }
-
-            stateEl.querySelectorAll('path').forEach(p => {
-                p.setAttribute('fill', rgb2hex(color));
-            });
+            stateEl.setAttribute('data-svc', svc ? 'Sim' : 'Não');
+            stateEl.classList.toggle('pulse', key === 'parada' || key === 'lenta');
+            stateEl.querySelectorAll('path').forEach(p => p.setAttribute('fill', st.cor));
         }
-        
-        // Update Table
-        const hexColor = rgb2hex(color);
-        const statusName = getStatusName(color);
-        
+
+        // Tabela
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td><strong>${uf}</strong></td>
             <td>${stateNames[uf] || uf}</td>
             <td>${ms}s</td>
-            <td><span class="badge" style="background-color: ${hexColor}; color: ${hexColor === '#eab308' ? '#000' : '#fff'}">${statusName}</span></td>
-            <td>${svc == 1 ? 'Sim' : 'Não'}</td>
+            <td><span class="badge" style="background-color: ${st.cor}; color: ${key === 'instavel' ? '#000' : '#fff'}">${st.nome}</span></td>
+            <td>${svc ? 'Sim' : 'Não'}</td>
             <td style="color: var(--text-secondary)">${now}</td>
         `;
         tbody.appendChild(tr);
-    }
-    
-    // Update Stats
+    });
+
     document.getElementById('stat-normal').textContent = countNormal;
     document.getElementById('stat-issues').textContent = countIssues;
     document.getElementById('stat-contingencia').textContent = countContingencia;
@@ -211,35 +190,14 @@ function showToast(message) {
     }, 3000);
 }
 
-// Fallback data generator if API is blocked by CORS
+// Gerador de dados simulados (usado só se a API falhar)
 function generateDummyData() {
-    const ufs = Object.keys(stateNames);
-    const data = { dados: { data: [], labels: [], backgroundColor: [], normal: [], svc: [] } };
-    
-    ufs.forEach(uf => {
-        data.dados.labels.push(uf);
-        const rand = Math.random();
-        
-        if (rand > 0.8) {
-            // Issue
-            data.dados.data.push((Math.random() * 5 + 2).toFixed(2));
-            data.dados.backgroundColor.push('rgb(239, 68, 68)'); // Parada
-            data.dados.normal.push(0);
-            data.dados.svc.push(0);
-        } else if (rand > 0.6) {
-            // Contingency
-            data.dados.data.push((Math.random() * 1 + 0.5).toFixed(2));
-            data.dados.backgroundColor.push('rgb(249, 115, 22)'); // Actually it's overridden by blue if svc=1
-            data.dados.normal.push(0);
-            data.dados.svc.push(1);
-        } else {
-            // Normal
-            data.dados.data.push((Math.random() * 0.5 + 0.1).toFixed(2));
-            data.dados.backgroundColor.push('rgb(16, 185, 129)');
-            data.dados.normal.push(1);
-            data.dados.svc.push(0);
-        }
+    const estados = Object.keys(stateNames).map(uf => {
+        const r = Math.random();
+        if (r > 0.9) return { uf, situacao: 'parada', tempo_medio: 0, svc_disponivel: false };
+        if (r > 0.8) return { uf, situacao: 'lenta', tempo_medio: 6, svc_disponivel: false };
+        if (r > 0.7) return { uf, situacao: 'instavel', tempo_medio: 3, svc_disponivel: false };
+        return { uf, situacao: 'normal', tempo_medio: 1, svc_disponivel: false };
     });
-    
-    return data;
+    return { consultado_em: new Date().toISOString(), estados };
 }
